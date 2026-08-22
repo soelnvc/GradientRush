@@ -1,5 +1,10 @@
 # Version History
 
+## Version 1.3.5 (UI: Ultra-Minimalist Workspace Switcher)
+- **Zero-AI-Slop Minimalism**: Stripped out glowing dots, gradients, and heavy drop-shadows.
+- **Clean Apple Typography**: Borderless text button (`#86868b` transitioning to `#ffffff` on hover with a subtle `▾`).
+- **Crisp Popover**: Flat dark backdrop with thin hairline borders and clean checkmark selections.
+
 ## Version 1.3.4 (Fix: All Workspaces Global Default & Multi-Workspace Toggle)
 - **Global View Default**: All historical files and evidence are visible by default under "All Workspaces".
 - **Dynamic Mode Badge**: Top-right pill button highlights active workspace or global mode with direct toggle.

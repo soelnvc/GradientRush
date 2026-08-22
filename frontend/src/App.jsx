@@ -144,73 +144,66 @@ function Nav() {
             <NavLink to="/compare" style={linkStyle}>Benchmark</NavLink>
           </nav>
 
-          {/* Right: Only 1 Single Premium Apple-Style Workspace Switcher Button */}
+          {/* Right: Minimalist Apple Workspace Switcher */}
           <div id="workspace-switcher-container" style={{ position: "relative" }}>
             <button
               onClick={() => setDropdownOpen(!dropdownOpen)}
               style={{
-                background: "rgba(255, 255, 255, 0.05)",
-                border: "1px solid rgba(255, 255, 255, 0.12)",
-                color: "#f5f5f7",
-                padding: "6px 14px",
-                borderRadius: "980px",
+                background: "transparent",
+                border: "none",
+                color: dropdownOpen ? "#ffffff" : "#86868b",
+                padding: "6px 0",
                 fontSize: "12px",
-                fontWeight: "500",
+                fontWeight: "400",
+                letterSpacing: "0.02em",
                 display: "flex",
                 alignItems: "center",
-                gap: "8px",
+                gap: "6px",
                 cursor: "pointer",
-                transition: "all 0.15s ease",
+                transition: "color 0.15s ease",
                 outline: "none",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = "rgba(255, 255, 255, 0.09)";
-                e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.22)";
+                e.currentTarget.style.color = "#ffffff";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = "rgba(255, 255, 255, 0.05)";
-                e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.12)";
+                if (!dropdownOpen) e.currentTarget.style.color = "#86868b";
               }}
             >
+              <span>{currentProject ? currentProject.name : "All Workspaces"}</span>
               <span
                 style={{
-                  width: "6px",
-                  height: "6px",
-                  borderRadius: "50%",
-                  background: currentProject ? "#3b82f6" : "#22c55e",
-                  boxShadow: currentProject ? "0 0 8px rgba(59, 130, 246, 0.6)" : "0 0 8px rgba(34, 197, 94, 0.6)",
+                  fontSize: "10px",
+                  opacity: 0.5,
+                  transform: dropdownOpen ? "rotate(180deg)" : "rotate(0deg)",
+                  transition: "transform 0.15s ease",
                 }}
-              />
-              <span style={{ maxWidth: "150px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                {currentProject ? currentProject.name : "All Workspaces"}
-              </span>
-              <span style={{ fontSize: "9px", opacity: 0.6, transform: dropdownOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s ease" }}>
-                ▼
+              >
+                ▾
               </span>
             </button>
 
-            {/* Expanded Apple-Style Popover Menu */}
+            {/* Minimalist Apple Popover */}
             {dropdownOpen && (
               <div
                 style={{
                   position: "absolute",
-                  top: "calc(100% + 8px)",
+                  top: "calc(100% + 12px)",
                   right: 0,
-                  width: "280px",
-                  background: "rgba(18, 18, 20, 0.95)",
-                  backdropFilter: "saturate(180%) blur(24px)",
-                  WebkitBackdropFilter: "saturate(180%) blur(24px)",
-                  border: "1px solid rgba(255, 255, 255, 0.12)",
-                  borderRadius: "14px",
-                  padding: "6px",
-                  boxShadow: "0 20px 40px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.05)",
+                  width: "240px",
+                  background: "rgba(10, 10, 12, 0.95)",
+                  backdropFilter: "blur(20px)",
+                  WebkitBackdropFilter: "blur(20px)",
+                  border: "1px solid rgba(255, 255, 255, 0.1)",
+                  borderRadius: "10px",
+                  padding: "4px",
                   zIndex: 100,
                   display: "flex",
                   flexDirection: "column",
-                  gap: "2px",
+                  gap: "1px",
                 }}
               >
-                {/* 1. TOP OPTION: + New Project */}
+                {/* 1. New Workspace */}
                 <div
                   onClick={() => {
                     setDropdownOpen(false);
@@ -219,47 +212,27 @@ function Nav() {
                   style={{
                     display: "flex",
                     alignItems: "center",
-                    gap: "10px",
-                    padding: "10px 12px",
-                    borderRadius: "8px",
+                    gap: "8px",
+                    padding: "8px 10px",
+                    borderRadius: "6px",
                     cursor: "pointer",
-                    background: "rgba(255, 255, 255, 0.05)",
-                    transition: "background 0.15s ease",
+                    fontSize: "12px",
+                    fontWeight: "500",
+                    color: "#f5f5f7",
+                    transition: "background 0.1s ease",
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.background = "rgba(255, 255, 255, 0.12)";
+                    e.currentTarget.style.background = "rgba(255, 255, 255, 0.08)";
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.background = "rgba(255, 255, 255, 0.05)";
+                    e.currentTarget.style.background = "transparent";
                   }}
                 >
-                  <div
-                    style={{
-                      width: "22px",
-                      height: "22px",
-                      borderRadius: "6px",
-                      background: "#ffffff",
-                      color: "#000000",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: "14px",
-                      fontWeight: "600",
-                    }}
-                  >
-                    +
-                  </div>
-                  <div>
-                    <div style={{ fontSize: "13px", fontWeight: "600", color: "#f5f5f7" }}>
-                      New Workspace
-                    </div>
-                    <div style={{ fontSize: "11px", color: "#86868b" }}>
-                      Create isolated project space
-                    </div>
-                  </div>
+                  <span style={{ fontSize: "14px", lineHeight: 1 }}>+</span>
+                  <span>New Workspace</span>
                 </div>
 
-                {/* 2. Global View: All Workspaces */}
+                {/* 2. All Workspaces */}
                 <div
                   onClick={() => {
                     switchProject("all");
@@ -269,44 +242,36 @@ function Nav() {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "space-between",
-                    padding: "8px 12px",
-                    borderRadius: "8px",
+                    padding: "8px 10px",
+                    borderRadius: "6px",
                     cursor: "pointer",
-                    background: currentProject === null ? "rgba(255, 255, 255, 0.08)" : "transparent",
-                    transition: "background 0.15s ease",
+                    fontSize: "12px",
+                    color: currentProject === null ? "#ffffff" : "#86868b",
+                    background: currentProject === null ? "rgba(255, 255, 255, 0.06)" : "transparent",
+                    transition: "background 0.1s ease, color 0.1s ease",
                   }}
                   onMouseEnter={(e) => {
-                    if (currentProject !== null) e.currentTarget.style.background = "rgba(255, 255, 255, 0.04)";
+                    if (currentProject !== null) {
+                      e.currentTarget.style.background = "rgba(255, 255, 255, 0.04)";
+                      e.currentTarget.style.color = "#ffffff";
+                    }
                   }}
                   onMouseLeave={(e) => {
-                    if (currentProject !== null) e.currentTarget.style.background = "transparent";
+                    if (currentProject !== null) {
+                      e.currentTarget.style.background = "transparent";
+                      e.currentTarget.style.color = "#86868b";
+                    }
                   }}
                 >
-                  <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-                    <span style={{ fontSize: "13px", fontWeight: currentProject === null ? "600" : "400", color: currentProject === null ? "#ffffff" : "#d1d1d6" }}>
-                      All Workspaces (Global)
-                    </span>
-                    <span style={{ fontSize: "11px", color: "#6e6e73" }}>
-                      View all uploaded sources across projects
-                    </span>
-                  </div>
-                  {currentProject === null && (
-                    <span style={{ color: "#ffffff", fontSize: "13px", fontWeight: "600" }}>
-                      ✓
-                    </span>
-                  )}
+                  <span>All Workspaces</span>
+                  {currentProject === null && <span style={{ fontSize: "11px" }}>✓</span>}
                 </div>
 
                 {/* Divider */}
-                <div style={{ height: "1px", background: "rgba(255, 255, 255, 0.08)", margin: "4px 6px" }} />
+                <div style={{ height: "1px", background: "rgba(255, 255, 255, 0.06)", margin: "3px 0" }} />
 
-                {/* Section Header */}
-                <div style={{ padding: "4px 10px", fontSize: "10px", fontWeight: "600", color: "#6e6e73", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                  Workspaces ({projects.length})
-                </div>
-
-                {/* List of Workspaces */}
-                <div style={{ maxHeight: "220px", overflowY: "auto", display: "flex", flexDirection: "column", gap: "2px" }}>
+                {/* Projects List */}
+                <div style={{ maxHeight: "200px", overflowY: "auto", display: "flex", flexDirection: "column", gap: "1px" }}>
                   {projects.map((p) => {
                     const isSelected = p.id === currentProject?.id;
                     return (
@@ -320,32 +285,31 @@ function Nav() {
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "space-between",
-                          padding: "8px 12px",
-                          borderRadius: "8px",
+                          padding: "8px 10px",
+                          borderRadius: "6px",
                           cursor: "pointer",
-                          background: isSelected ? "rgba(255, 255, 255, 0.08)" : "transparent",
-                          transition: "background 0.15s ease",
+                          fontSize: "12px",
+                          color: isSelected ? "#ffffff" : "#86868b",
+                          background: isSelected ? "rgba(255, 255, 255, 0.06)" : "transparent",
+                          transition: "background 0.1s ease, color 0.1s ease",
                         }}
                         onMouseEnter={(e) => {
-                          if (!isSelected) e.currentTarget.style.background = "rgba(255, 255, 255, 0.04)";
+                          if (!isSelected) {
+                            e.currentTarget.style.background = "rgba(255, 255, 255, 0.04)";
+                            e.currentTarget.style.color = "#ffffff";
+                          }
                         }}
                         onMouseLeave={(e) => {
-                          if (!isSelected) e.currentTarget.style.background = "transparent";
+                          if (!isSelected) {
+                            e.currentTarget.style.background = "transparent";
+                            e.currentTarget.style.color = "#86868b";
+                          }
                         }}
                       >
-                        <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-                          <span style={{ fontSize: "13px", fontWeight: isSelected ? "600" : "400", color: isSelected ? "#ffffff" : "#d1d1d6" }}>
-                            {p.name}
-                          </span>
-                          <span style={{ fontSize: "11px", color: "#6e6e73" }}>
-                            {p.sources_count || 0} sources
-                          </span>
-                        </div>
-                        {isSelected && (
-                          <span style={{ color: "#ffffff", fontSize: "13px", fontWeight: "600" }}>
-                            ✓
-                          </span>
-                        )}
+                        <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                          {p.name}
+                        </span>
+                        {isSelected && <span style={{ fontSize: "11px" }}>✓</span>}
                       </div>
                     );
                   })}
