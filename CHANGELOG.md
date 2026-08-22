@@ -1,5 +1,12 @@
 # Version History
 
+## Version 1.4.5 (Fix: Mathematically Rigorous Vector Metrics)
+- **Vector Metrics Rigor**: Replaced misleading 100% confidence scores with exact mathematical vector metrics: `Cosine Distance: {distance}` and `Similarity: {1.0 - distance}` (e.g. Distance 0.3721 -> Similarity 0.6279).
+- **Backend & UI Metric Alignment**: Updated FastAPI query API and frontend evidence cards to display verified vector metrics.
+
+## Version 1.4.4 (UI: Top-Aligned Action Buttons)
+- **Top-Aligned Buttons**: Form actions (`Compare` and `Search`) stay fixed at the top edge when typing multiline queries.
+
 ## Version 1.4.3 (UI: Auto-Expanding Input & Click-to-Expand Evidence Cards)
 - **Auto-Growing Input Textarea**: In Search and Benchmark, input boxes smoothly expand in height to show full multiline prompts without horizontal truncation. Supports `Enter` to search and `Shift+Enter` for newlines.
 - **Click-to-Expand Evidence Cards**: Users can click any evidence box to expand it, revealing full untruncated text, video frame previews, timestamps, and cosine distance metadata.

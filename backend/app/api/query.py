@@ -69,7 +69,7 @@ async def query_knowledge(
     # 4. Synthesize answer
     answer = ai_provider.synthesize_answer(q, context_str)
 
-    # 5. Level 8: Format response with provenance and expansion chains
+    # 5. Level 8: Format response with provenance, cosine distance, and vector similarity
     return {
         "answer": answer,
         "evidence": [
@@ -82,8 +82,8 @@ async def query_knowledge(
                 "end_time": e.end_time,
                 "page_number": e.page_number,
                 "frame_path": e.frame_path,
-                "confidence": e.confidence,
                 "distance": round(dist, 4),
+                "similarity": round(max(0.0, min(1.0, 1.0 - dist)), 4),
                 "chain": chain,
             }
             for e, dist, chain in expanded_results

@@ -299,7 +299,7 @@ export default function Query() {
                     {isExpanded && e.distance !== undefined && (
                       <div style={{ display: "flex", gap: "16px", fontSize: "12px", color: "#86868b", paddingTop: "8px", borderTop: "1px solid rgba(255, 255, 255, 0.04)" }}>
                         <span>Cosine Distance: {e.distance}</span>
-                        {e.confidence && <span>Confidence Score: {(e.confidence * 100).toFixed(0)}%</span>}
+                        <span>Similarity: {e.similarity !== undefined ? e.similarity : (1.0 - e.distance).toFixed(4)}</span>
                       </div>
                     )}
                   </div>

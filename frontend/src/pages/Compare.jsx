@@ -199,9 +199,9 @@ export default function Compare() {
                   )}
 
                   {isExpanded && e.distance !== undefined && (
-                    <div style={{ display: "flex", gap: "12px", fontSize: "11px", color: "#71717a", paddingTop: "4px", borderTop: "1px solid rgba(255, 255, 255, 0.04)" }}>
+                    <div style={{ display: "flex", gap: "16px", fontSize: "11px", color: "#86868b", paddingTop: "6px", borderTop: "1px solid rgba(255, 255, 255, 0.04)" }}>
                       <span>Cosine Distance: {e.distance}</span>
-                      {e.confidence && <span>Confidence: {(e.confidence * 100).toFixed(0)}%</span>}
+                      <span>Similarity: {e.similarity !== undefined ? e.similarity : (1.0 - e.distance).toFixed(4)}</span>
                     </div>
                   )}
                 </div>
