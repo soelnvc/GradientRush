@@ -15,13 +15,16 @@ export function ProjectProvider({ children }) {
       setProjects(data);
 
       const savedProjectId = localStorage.getItem("gradientrush_active_project_id");
-      const matched = data.find((p) => p.id === savedProjectId);
-
-      if (matched) {
-        setCurrentProject(matched);
-      } else if (data.length > 0) {
-        setCurrentProject(data[0]);
-        localStorage.setItem("gradientrush_active_project_id", data[0].id);
+      if (savedProjectId === "all" || savedProjectId === null) {
+        // All workspaces view
+        setCurrentProject(null);
+      } else {
+        const matched = data.find((p) => p.id === savedProjectId);
+        if (matched) {
+          setCurrentProject(matched);
+        } else if (data.length > 0) {
+          setCurrentProject(null);
+        }
       }
     } catch (err) {
       console.error("Failed to load projects:", err);
@@ -35,6 +38,11 @@ export function ProjectProvider({ children }) {
   }, []);
 
   const switchProject = (projectId) => {
+    if (!projectId || projectId === "all") {
+      setCurrentProject(null);
+      localStorage.setItem("gradientrush_active_project_id", "all");
+      return;
+    }
     const proj = projects.find((p) => p.id === projectId);
     if (proj) {
       setCurrentProject(proj);

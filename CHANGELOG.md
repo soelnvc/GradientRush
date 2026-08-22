@@ -1,5 +1,9 @@
 # Version History
 
+## Version 1.3.3 (Fix: All Workspaces Global View & Workspace Switching)
+- **All Workspaces Global View**: Added a global viewing mode so all historical documents across all workspaces can be browsed together.
+- **Seamless Workspace Switching**: Switch between "All Workspaces", "System Design Workspace", or "New" directly from the top-right button.
+
 ## Version 1.3.2 (UI: Seamless Blended Navbar & 63px Height)
 - **Taller Navbar**: Increased navbar height to 63px (+15px) for spacious elegance.
 - **Borderless Aesthetic**: Removed bottom hairline separator for a continuous flow.

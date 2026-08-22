@@ -259,6 +259,44 @@ function Nav() {
                   </div>
                 </div>
 
+                {/* 2. Global View: All Workspaces */}
+                <div
+                  onClick={() => {
+                    switchProject("all");
+                    setDropdownOpen(false);
+                  }}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    padding: "8px 12px",
+                    borderRadius: "8px",
+                    cursor: "pointer",
+                    background: currentProject === null ? "rgba(255, 255, 255, 0.08)" : "transparent",
+                    transition: "background 0.15s ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    if (currentProject !== null) e.currentTarget.style.background = "rgba(255, 255, 255, 0.04)";
+                  }}
+                  onMouseLeave={(e) => {
+                    if (currentProject !== null) e.currentTarget.style.background = "transparent";
+                  }}
+                >
+                  <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+                    <span style={{ fontSize: "13px", fontWeight: currentProject === null ? "600" : "400", color: currentProject === null ? "#ffffff" : "#d1d1d6" }}>
+                      All Workspaces (Global)
+                    </span>
+                    <span style={{ fontSize: "11px", color: "#6e6e73" }}>
+                      View all uploaded sources across projects
+                    </span>
+                  </div>
+                  {currentProject === null && (
+                    <span style={{ color: "#ffffff", fontSize: "13px", fontWeight: "600" }}>
+                      ✓
+                    </span>
+                  )}
+                </div>
+
                 {/* Divider */}
                 <div style={{ height: "1px", background: "rgba(255, 255, 255, 0.08)", margin: "4px 6px" }} />
 
