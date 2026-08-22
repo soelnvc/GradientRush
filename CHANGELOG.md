@@ -1,5 +1,9 @@
 # Version History
 
+## Version 1.3.4 (Fix: All Workspaces Global Default & Multi-Workspace Toggle)
+- **Global View Default**: All historical files and evidence are visible by default under "All Workspaces".
+- **Dynamic Mode Badge**: Top-right pill button highlights active workspace or global mode with direct toggle.
+
 ## Version 1.3.3 (Fix: All Workspaces Global View & Workspace Switching)
 - **All Workspaces Global View**: Added a global viewing mode so all historical documents across all workspaces can be browsed together.
 - **Seamless Workspace Switching**: Switch between "All Workspaces", "System Design Workspace", or "New" directly from the top-right button.

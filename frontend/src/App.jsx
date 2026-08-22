@@ -177,12 +177,12 @@ function Nav() {
                   width: "6px",
                   height: "6px",
                   borderRadius: "50%",
-                  background: "#22c55e",
-                  boxShadow: "0 0 8px rgba(34, 197, 94, 0.6)",
+                  background: currentProject ? "#3b82f6" : "#22c55e",
+                  boxShadow: currentProject ? "0 0 8px rgba(59, 130, 246, 0.6)" : "0 0 8px rgba(34, 197, 94, 0.6)",
                 }}
               />
               <span style={{ maxWidth: "150px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                {currentProject?.name || "Select Workspace"}
+                {currentProject ? currentProject.name : "All Workspaces"}
               </span>
               <span style={{ fontSize: "9px", opacity: 0.6, transform: dropdownOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s ease" }}>
                 ▼
