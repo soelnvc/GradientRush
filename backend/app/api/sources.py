@@ -63,9 +63,9 @@ async def upload_source(
     save_dir = RAW_DIR / str(source_id)
     save_dir.mkdir(parents=True, exist_ok=True)
     file_path = save_dir / file.filename
-
+    content = await file.read()
     with open(file_path, "wb") as f:
-        shutil.copyfileobj(file.file, f)
+        f.write(content)
 
     # Create DB record
     source = Source(
