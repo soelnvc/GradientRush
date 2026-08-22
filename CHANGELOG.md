@@ -1,5 +1,10 @@
 # Version History
 
+## Version 1.2.0 (Level 12: Final Boss & Demo Readiness)
+- **All Levels (0–12) Complete**: 100% feature-complete implementation of the Multimodal Knowledge Engine.
+- **Judge Pitch & Demo Playbook**: Created comprehensive `DEMO.md` containing the 60-second elevator pitch, live walkthrough steps, and Text-RAG vs Multimodal comparison matrices.
+- **End-to-End Verification**: Confirmed cross-modal relationship expansion, timestamp seeking, PDF citations, and grounded answer synthesis.
+
 ## Version 1.1.1 (UI Polish: Apple Monochrome Redesign)
 - **Apple Premium Aesthetics**: Pure black `#000000` monochrome theme with elevated translucent glass surfaces and subtle borders.
 - **Navbar Redesign**: Center-aligned navigation with wide 48px spacing, thin typography (12px SF Pro), and frosted glass blur.
