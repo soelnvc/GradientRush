@@ -1,5 +1,9 @@
 # Version History
 
+## Version 1.4.3 (UI: Auto-Expanding Input & Click-to-Expand Evidence Cards)
+- **Auto-Growing Input Textarea**: In Search and Benchmark, input boxes smoothly expand in height to show full multiline prompts without horizontal truncation. Supports `Enter` to search and `Shift+Enter` for newlines.
+- **Click-to-Expand Evidence Cards**: Users can click any evidence box to expand it, revealing full untruncated text, video frame previews, timestamps, and cosine distance metadata.
+
 ## Version 1.4.2 (Fix: Balanced Cross-Modal Retrieval & Multi-Source Synthesis)
 - **Balanced Cross-Modal Retrieval**: Eliminates modality starvation in vector search by querying both visual/speech frames and PDF text documents in parallel.
 - **Multimodal Benchmark Verification**: Fixed complex cross-modal question where Multimodal RAG accurately describes video diagrams & PDF architecture, while Text-Only baseline correctly fails.

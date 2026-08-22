@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { queryKnowledge } from "../api/client";
 import { useProject } from "../context/ProjectContext";
@@ -9,10 +9,28 @@ export default function Query() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
+  const [expandedCards, setExpandedCards] = useState({});
+  const textareaRef = useRef(null);
+
+  // Auto-resize textarea height to fit content
+  const handleInputChange = (e) => {
+    setQuestion(e.target.value);
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 260)}px`;
+    }
+  };
+
+  const toggleExpand = (cardKey) => {
+    setExpandedCards((prev) => ({
+      ...prev,
+      [cardKey]: !prev[cardKey],
+    }));
+  };
 
   const handleSearch = async (e) => {
-    e.preventDefault();
-    if (!question.trim()) return;
+    if (e) e.preventDefault();
+    if (!question.trim() || loading) return;
 
     setLoading(true);
     setError(null);
@@ -28,6 +46,13 @@ export default function Query() {
     }
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSearch(e);
+    }
+  };
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "40px" }}>
       <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
@@ -36,56 +61,71 @@ export default function Query() {
             Workspace Context:
           </span>
           <span style={{ fontSize: "12px", color: "#ffffff", fontWeight: "500" }}>
-            {currentProject?.name || "All Sources"}
+            {currentProject?.name || "All Workspaces (Global)"}
           </span>
         </div>
         <h1 style={{ fontSize: "36px", fontWeight: "600", color: "#f5f5f7", letterSpacing: "-0.03em" }}>
           Query Engine
         </h1>
         <p style={{ color: "#86868b", fontSize: "16px" }}>
-          Search across speech, documents, diagrams, and video frames within this workspace.
+          Search across speech, documents, diagrams, and video frames with provenance graphs.
         </p>
       </div>
 
-      <form onSubmit={handleSearch} style={{ display: "flex", gap: "12px", width: "100%" }}>
-        <input
-          type="text"
-          placeholder="Ask a question across your media library..."
-          value={question}
-          onChange={(e) => setQuestion(e.target.value)}
-          style={{
-            flex: 1,
-            padding: "16px 20px",
-            background: "rgba(255, 255, 255, 0.04)",
-            border: "1px solid rgba(255, 255, 255, 0.1)",
-            borderRadius: "14px",
-            color: "#f5f5f7",
-            fontSize: "16px",
-            outline: "none",
-            transition: "border-color 0.2s ease, background 0.2s ease",
-          }}
-          onFocus={(e) => {
-            e.target.style.borderColor = "rgba(255, 255, 255, 0.3)";
-            e.target.style.background = "rgba(255, 255, 255, 0.06)";
-          }}
-          onBlur={(e) => {
-            e.target.style.borderColor = "rgba(255, 255, 255, 0.1)";
-            e.target.style.background = "rgba(255, 255, 255, 0.04)";
-          }}
-        />
+      <form onSubmit={handleSearch} style={{ display: "flex", alignItems: "flex-end", gap: "12px", width: "100%" }}>
+        <div style={{ flex: 1, position: "relative" }}>
+          <textarea
+            ref={textareaRef}
+            rows={1}
+            placeholder="Ask a question across your media library (e.g. 'How does asynchronous replication handle leader failure?')..."
+            value={question}
+            onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
+            style={{
+              width: "100%",
+              minHeight: "56px",
+              maxHeight: "260px",
+              padding: "16px 20px",
+              background: "rgba(255, 255, 255, 0.04)",
+              border: "1px solid rgba(255, 255, 255, 0.1)",
+              borderRadius: "14px",
+              color: "#f5f5f7",
+              fontSize: "15px",
+              lineHeight: "1.5",
+              outline: "none",
+              resize: "none",
+              boxSizing: "border-box",
+              transition: "border-color 0.2s ease, background 0.2s ease",
+            }}
+            onFocus={(e) => {
+              e.target.style.borderColor = "rgba(255, 255, 255, 0.3)";
+              e.target.style.background = "rgba(255, 255, 255, 0.06)";
+            }}
+            onBlur={(e) => {
+              e.target.style.borderColor = "rgba(255, 255, 255, 0.1)";
+              e.target.style.background = "rgba(255, 255, 255, 0.04)";
+            }}
+          />
+        </div>
         <button
           type="submit"
           disabled={!question.trim() || loading}
           style={{
+            height: "56px",
             padding: "0 28px",
             background: "#ffffff",
             color: "#000000",
             border: "none",
-            borderRadius: "980px",
-            fontWeight: "500",
+            borderRadius: "14px",
+            fontWeight: "600",
             fontSize: "14px",
             cursor: question.trim() && !loading ? "pointer" : "not-allowed",
             opacity: question.trim() && !loading ? 1 : 0.4,
+            whiteSpace: "nowrap",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            transition: "all 0.15s ease",
           }}
         >
           {loading ? "Synthesizing..." : "Search"}
@@ -123,6 +163,7 @@ export default function Query() {
                 fontSize: "16px",
                 lineHeight: "1.7",
                 color: "#f5f5f7",
+                whiteSpace: "pre-wrap",
               }}
             >
               {result.answer}
@@ -138,81 +179,132 @@ export default function Query() {
             </div>
 
             <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-              {result.evidence?.map((e, idx) => (
-                <div
-                  key={e.id || idx}
-                  style={{
-                    background: "rgba(255, 255, 255, 0.02)",
-                    border: "1px solid rgba(255, 255, 255, 0.06)",
-                    padding: "20px",
-                    borderRadius: "14px",
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "12px",
-                  }}
-                >
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                      <span
-                        style={{
-                          fontSize: "11px",
-                          fontWeight: "600",
-                          textTransform: "uppercase",
-                          letterSpacing: "0.03em",
-                          padding: "3px 8px",
-                          borderRadius: "4px",
-                          background: "rgba(255, 255, 255, 0.08)",
-                          color: "#f5f5f7",
-                        }}
-                      >
-                        {e.modality}
-                      </span>
-                      {e.chain && e.chain !== "Direct retrieval" && (
-                        <span style={{ fontSize: "12px", color: "#86868b" }}>
-                          ↳ {e.chain}
+              {result.evidence?.map((e, idx) => {
+                const cardKey = e.id || `evidence-${idx}`;
+                const isExpanded = !!expandedCards[cardKey];
+
+                return (
+                  <div
+                    key={cardKey}
+                    onClick={() => toggleExpand(cardKey)}
+                    style={{
+                      background: isExpanded ? "rgba(255, 255, 255, 0.04)" : "rgba(255, 255, 255, 0.02)",
+                      border: isExpanded ? "1px solid rgba(255, 255, 255, 0.15)" : "1px solid rgba(255, 255, 255, 0.06)",
+                      padding: "20px",
+                      borderRadius: "14px",
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "12px",
+                      cursor: "pointer",
+                      transition: "all 0.15s ease",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.18)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.borderColor = isExpanded ? "rgba(255, 255, 255, 0.15)" : "rgba(255, 255, 255, 0.06)";
+                    }}
+                  >
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                        <span
+                          style={{
+                            fontSize: "11px",
+                            fontWeight: "700",
+                            textTransform: "uppercase",
+                            letterSpacing: "0.03em",
+                            padding: "3px 8px",
+                            borderRadius: "4px",
+                            background: "rgba(255, 255, 255, 0.08)",
+                            color: "#f5f5f7",
+                          }}
+                        >
+                          {e.modality}
                         </span>
-                      )}
+                        {e.chain && e.chain !== "Direct retrieval" && (
+                          <span style={{ fontSize: "12px", color: "#86868b" }}>
+                            ↳ {e.chain}
+                          </span>
+                        )}
+                      </div>
+
+                      <div style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "13px" }}>
+                        {e.start_time !== undefined && e.start_time !== null && (
+                          <Link
+                            to={`/sources/${e.source_id}?t=${e.start_time}`}
+                            onClick={(ev) => ev.stopPropagation()}
+                            style={{
+                              color: "#f5f5f7",
+                              padding: "3px 10px",
+                              borderRadius: "980px",
+                              background: "rgba(255, 255, 255, 0.06)",
+                              border: "1px solid rgba(255, 255, 255, 0.08)",
+                              fontSize: "12px",
+                              textDecoration: "none",
+                            }}
+                          >
+                            ⏱ {e.start_time.toFixed(1)}s
+                          </Link>
+                        )}
+                        {e.page_number !== undefined && e.page_number !== null && (
+                          <Link
+                            to={`/sources/${e.source_id}?page=${e.page_number}`}
+                            onClick={(ev) => ev.stopPropagation()}
+                            style={{
+                              color: "#f5f5f7",
+                              padding: "3px 10px",
+                              borderRadius: "980px",
+                              background: "rgba(255, 255, 255, 0.06)",
+                              border: "1px solid rgba(255, 255, 255, 0.08)",
+                              fontSize: "12px",
+                              textDecoration: "none",
+                            }}
+                          >
+                            Page {e.page_number}
+                          </Link>
+                        )}
+                        <span style={{ fontSize: "11px", color: isExpanded ? "#ffffff" : "#71717a" }}>
+                          {isExpanded ? "Collapse ▲" : "Expand ▼"}
+                        </span>
+                      </div>
                     </div>
 
-                    <div style={{ display: "flex", gap: "12px", fontSize: "13px" }}>
-                      {e.start_time !== null && (
-                        <Link
-                          to={`/sources/${e.source_id}?t=${e.start_time}`}
-                          style={{
-                            color: "#f5f5f7",
-                            padding: "2px 8px",
-                            borderRadius: "980px",
-                            background: "rgba(255, 255, 255, 0.06)",
-                            border: "1px solid rgba(255, 255, 255, 0.08)",
-                            fontSize: "12px",
-                          }}
-                        >
-                          ⏱ {e.start_time.toFixed(1)}s
-                        </Link>
-                      )}
-                      {e.page_number !== null && (
-                        <Link
-                          to={`/sources/${e.source_id}?page=${e.page_number}`}
-                          style={{
-                            color: "#f5f5f7",
-                            padding: "2px 8px",
-                            borderRadius: "980px",
-                            background: "rgba(255, 255, 255, 0.06)",
-                            border: "1px solid rgba(255, 255, 255, 0.08)",
-                            fontSize: "12px",
-                          }}
-                        >
-                          Page {e.page_number}
-                        </Link>
-                      )}
-                    </div>
+                    <p
+                      style={{
+                        fontSize: "15px",
+                        color: isExpanded ? "#f5f5f7" : "#d1d1d6",
+                        margin: 0,
+                        lineHeight: "1.6",
+                        whiteSpace: isExpanded ? "pre-wrap" : "normal",
+                        display: isExpanded ? "block" : "-webkit-box",
+                        WebkitLineClamp: isExpanded ? "unset" : 3,
+                        WebkitBoxOrient: "vertical",
+                        overflow: "hidden",
+                      }}
+                    >
+                      {e.content}
+                    </p>
+
+                    {isExpanded && e.frame_path && (
+                      <div style={{ marginTop: "8px", borderRadius: "10px", overflow: "hidden", border: "1px solid rgba(255, 255, 255, 0.1)" }}>
+                        <img
+                          src={`/api/media/${e.frame_path.replace(/^data\//, "")}`}
+                          alt="Evidence Frame"
+                          style={{ width: "100%", maxHeight: "360px", objectFit: "contain", background: "#000000" }}
+                          onError={(ev) => { ev.target.style.display = "none"; }}
+                        />
+                      </div>
+                    )}
+
+                    {isExpanded && e.distance !== undefined && (
+                      <div style={{ display: "flex", gap: "16px", fontSize: "12px", color: "#86868b", paddingTop: "8px", borderTop: "1px solid rgba(255, 255, 255, 0.04)" }}>
+                        <span>Cosine Distance: {e.distance}</span>
+                        {e.confidence && <span>Confidence Score: {(e.confidence * 100).toFixed(0)}%</span>}
+                      </div>
+                    )}
                   </div>
-
-                  <p style={{ fontSize: "15px", color: "#d1d1d6", margin: 0, lineHeight: "1.6" }}>
-                    {e.content}
-                  </p>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>
