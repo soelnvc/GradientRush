@@ -86,54 +86,233 @@ function Nav() {
             margin: "0 auto",
           }}
         >
-          {/* Left: GR Logo with 360-degree rotation on hover */}
-          <NavLink
-            to="/"
-            style={{
-              textDecoration: "none",
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-            }}
-          >
-            <div
+          {/* Left: GR Logo + Slash + Minimalist Workspace Switcher */}
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <NavLink
+              to="/"
               style={{
-                width: "28px",
-                height: "28px",
-                borderRadius: "8px",
-                background: "linear-gradient(135deg, #ffffff 0%, #a1a1aa 100%)",
-                color: "#000000",
+                textDecoration: "none",
                 display: "flex",
                 alignItems: "center",
-                justifyContent: "center",
-                fontWeight: "900",
-                fontSize: "13px",
-                letterSpacing: "-0.04em",
-                boxShadow: "0 2px 8px rgba(255, 255, 255, 0.15)",
-                transition: "transform 0.65s cubic-bezier(0.34, 1.56, 0.64, 1)",
-                cursor: "pointer",
-                userSelect: "none",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "rotate(360deg)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "rotate(0deg)";
+                gap: "8px",
               }}
             >
-              GR
+              <div
+                style={{
+                  width: "28px",
+                  height: "28px",
+                  borderRadius: "8px",
+                  background: "linear-gradient(135deg, #ffffff 0%, #a1a1aa 100%)",
+                  color: "#000000",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontWeight: "900",
+                  fontSize: "13px",
+                  letterSpacing: "-0.04em",
+                  boxShadow: "0 2px 8px rgba(255, 255, 255, 0.15)",
+                  transition: "transform 0.65s cubic-bezier(0.34, 1.56, 0.64, 1)",
+                  cursor: "pointer",
+                  userSelect: "none",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = "rotate(360deg)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "rotate(0deg)";
+                }}
+              >
+                GR
+              </div>
+              <span
+                style={{
+                  fontSize: "13px",
+                  fontWeight: "600",
+                  letterSpacing: "-0.02em",
+                  color: "#f5f5f7",
+                }}
+              >
+                GradientRush
+              </span>
+            </NavLink>
+
+            {/* Slash Separator */}
+            <span style={{ color: "rgba(255, 255, 255, 0.18)", fontSize: "12px", fontWeight: "300" }}>/</span>
+
+            {/* Minimalist Apple Workspace Switcher on Left */}
+            <div id="workspace-switcher-container" style={{ position: "relative" }}>
+              <button
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+                style={{
+                  background: "transparent",
+                  border: "none",
+                  color: dropdownOpen ? "#ffffff" : "#86868b",
+                  padding: "4px 0",
+                  fontSize: "12px",
+                  fontWeight: "400",
+                  letterSpacing: "0.02em",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  cursor: "pointer",
+                  transition: "color 0.15s ease",
+                  outline: "none",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = "#ffffff";
+                }}
+                onMouseLeave={(e) => {
+                  if (!dropdownOpen) e.currentTarget.style.color = "#86868b";
+                }}
+              >
+                <span>{currentProject ? currentProject.name : "All Workspaces"}</span>
+                <span
+                  style={{
+                    fontSize: "10px",
+                    opacity: 0.5,
+                    transform: dropdownOpen ? "rotate(180deg)" : "rotate(0deg)",
+                    transition: "transform 0.15s ease",
+                  }}
+                >
+                  ▾
+                </span>
+              </button>
+
+              {/* Minimalist Apple Popover */}
+              {dropdownOpen && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "calc(100% + 12px)",
+                    left: 0,
+                    width: "240px",
+                    background: "rgba(10, 10, 12, 0.95)",
+                    backdropFilter: "blur(20px)",
+                    WebkitBackdropFilter: "blur(20px)",
+                    border: "1px solid rgba(255, 255, 255, 0.1)",
+                    borderRadius: "10px",
+                    padding: "4px",
+                    zIndex: 100,
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "1px",
+                  }}
+                >
+                  {/* 1. New Workspace */}
+                  <div
+                    onClick={() => {
+                      setDropdownOpen(false);
+                      setShowModal(true);
+                    }}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      padding: "8px 10px",
+                      borderRadius: "6px",
+                      cursor: "pointer",
+                      fontSize: "12px",
+                      fontWeight: "500",
+                      color: "#f5f5f7",
+                      transition: "background 0.1s ease",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = "rgba(255, 255, 255, 0.08)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = "transparent";
+                    }}
+                  >
+                    <span style={{ fontSize: "14px", lineHeight: 1 }}>+</span>
+                    <span>New Workspace</span>
+                  </div>
+
+                  {/* 2. All Workspaces */}
+                  <div
+                    onClick={() => {
+                      switchProject("all");
+                      setDropdownOpen(false);
+                    }}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      padding: "8px 10px",
+                      borderRadius: "6px",
+                      cursor: "pointer",
+                      fontSize: "12px",
+                      color: currentProject === null ? "#ffffff" : "#86868b",
+                      background: currentProject === null ? "rgba(255, 255, 255, 0.06)" : "transparent",
+                      transition: "background 0.1s ease, color 0.1s ease",
+                    }}
+                    onMouseEnter={(e) => {
+                      if (currentProject !== null) {
+                        e.currentTarget.style.background = "rgba(255, 255, 255, 0.04)";
+                        e.currentTarget.style.color = "#ffffff";
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (currentProject !== null) {
+                        e.currentTarget.style.background = "transparent";
+                        e.currentTarget.style.color = "#86868b";
+                      }
+                    }}
+                  >
+                    <span>All Workspaces</span>
+                    {currentProject === null && <span style={{ fontSize: "11px" }}>✓</span>}
+                  </div>
+
+                  {/* Divider */}
+                  <div style={{ height: "1px", background: "rgba(255, 255, 255, 0.06)", margin: "3px 0" }} />
+
+                  {/* Projects List */}
+                  <div style={{ maxHeight: "200px", overflowY: "auto", display: "flex", flexDirection: "column", gap: "1px" }}>
+                    {projects.map((p) => {
+                      const isSelected = p.id === currentProject?.id;
+                      return (
+                        <div
+                          key={p.id}
+                          onClick={() => {
+                            switchProject(p.id);
+                            setDropdownOpen(false);
+                          }}
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            padding: "8px 10px",
+                            borderRadius: "6px",
+                            cursor: "pointer",
+                            fontSize: "12px",
+                            color: isSelected ? "#ffffff" : "#86868b",
+                            background: isSelected ? "rgba(255, 255, 255, 0.06)" : "transparent",
+                            transition: "background 0.1s ease, color 0.1s ease",
+                          }}
+                          onMouseEnter={(e) => {
+                            if (!isSelected) {
+                              e.currentTarget.style.background = "rgba(255, 255, 255, 0.04)";
+                              e.currentTarget.style.color = "#ffffff";
+                            }
+                          }}
+                          onMouseLeave={(e) => {
+                            if (!isSelected) {
+                              e.currentTarget.style.background = "transparent";
+                              e.currentTarget.style.color = "#86868b";
+                            }
+                          }}
+                        >
+                          <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                            {p.name}
+                          </span>
+                          {isSelected && <span style={{ fontSize: "11px" }}>✓</span>}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
-            <span
-              style={{
-                fontSize: "13px",
-                fontWeight: "600",
-                letterSpacing: "-0.02em",
-                color: "#f5f5f7",
-              }}
-            >
-              GradientRush
-            </span>
-          </NavLink>
+          </div>
 
           {/* Center: Main Navigation with doubled gap */}
           <nav
@@ -149,180 +328,6 @@ function Nav() {
             <NavLink to="/query" style={linkStyle}>Search</NavLink>
             <NavLink to="/compare" style={linkStyle}>Benchmark</NavLink>
           </nav>
-
-          {/* Right: Minimalist Apple Workspace Switcher */}
-          <div id="workspace-switcher-container" style={{ position: "relative" }}>
-            <button
-              onClick={() => setDropdownOpen(!dropdownOpen)}
-              style={{
-                background: "transparent",
-                border: "none",
-                color: dropdownOpen ? "#ffffff" : "#86868b",
-                padding: "6px 0",
-                fontSize: "12px",
-                fontWeight: "400",
-                letterSpacing: "0.02em",
-                display: "flex",
-                alignItems: "center",
-                gap: "6px",
-                cursor: "pointer",
-                transition: "color 0.15s ease",
-                outline: "none",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.color = "#ffffff";
-              }}
-              onMouseLeave={(e) => {
-                if (!dropdownOpen) e.currentTarget.style.color = "#86868b";
-              }}
-            >
-              <span>{currentProject ? currentProject.name : "All Workspaces"}</span>
-              <span
-                style={{
-                  fontSize: "10px",
-                  opacity: 0.5,
-                  transform: dropdownOpen ? "rotate(180deg)" : "rotate(0deg)",
-                  transition: "transform 0.15s ease",
-                }}
-              >
-                ▾
-              </span>
-            </button>
-
-            {/* Minimalist Apple Popover */}
-            {dropdownOpen && (
-              <div
-                style={{
-                  position: "absolute",
-                  top: "calc(100% + 12px)",
-                  right: 0,
-                  width: "240px",
-                  background: "rgba(10, 10, 12, 0.95)",
-                  backdropFilter: "blur(20px)",
-                  WebkitBackdropFilter: "blur(20px)",
-                  border: "1px solid rgba(255, 255, 255, 0.1)",
-                  borderRadius: "10px",
-                  padding: "4px",
-                  zIndex: 100,
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "1px",
-                }}
-              >
-                {/* 1. New Workspace */}
-                <div
-                  onClick={() => {
-                    setDropdownOpen(false);
-                    setShowModal(true);
-                  }}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "8px",
-                    padding: "8px 10px",
-                    borderRadius: "6px",
-                    cursor: "pointer",
-                    fontSize: "12px",
-                    fontWeight: "500",
-                    color: "#f5f5f7",
-                    transition: "background 0.1s ease",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = "rgba(255, 255, 255, 0.08)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = "transparent";
-                  }}
-                >
-                  <span style={{ fontSize: "14px", lineHeight: 1 }}>+</span>
-                  <span>New Workspace</span>
-                </div>
-
-                {/* 2. All Workspaces */}
-                <div
-                  onClick={() => {
-                    switchProject("all");
-                    setDropdownOpen(false);
-                  }}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    padding: "8px 10px",
-                    borderRadius: "6px",
-                    cursor: "pointer",
-                    fontSize: "12px",
-                    color: currentProject === null ? "#ffffff" : "#86868b",
-                    background: currentProject === null ? "rgba(255, 255, 255, 0.06)" : "transparent",
-                    transition: "background 0.1s ease, color 0.1s ease",
-                  }}
-                  onMouseEnter={(e) => {
-                    if (currentProject !== null) {
-                      e.currentTarget.style.background = "rgba(255, 255, 255, 0.04)";
-                      e.currentTarget.style.color = "#ffffff";
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (currentProject !== null) {
-                      e.currentTarget.style.background = "transparent";
-                      e.currentTarget.style.color = "#86868b";
-                    }
-                  }}
-                >
-                  <span>All Workspaces</span>
-                  {currentProject === null && <span style={{ fontSize: "11px" }}>✓</span>}
-                </div>
-
-                {/* Divider */}
-                <div style={{ height: "1px", background: "rgba(255, 255, 255, 0.06)", margin: "3px 0" }} />
-
-                {/* Projects List */}
-                <div style={{ maxHeight: "200px", overflowY: "auto", display: "flex", flexDirection: "column", gap: "1px" }}>
-                  {projects.map((p) => {
-                    const isSelected = p.id === currentProject?.id;
-                    return (
-                      <div
-                        key={p.id}
-                        onClick={() => {
-                          switchProject(p.id);
-                          setDropdownOpen(false);
-                        }}
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          padding: "8px 10px",
-                          borderRadius: "6px",
-                          cursor: "pointer",
-                          fontSize: "12px",
-                          color: isSelected ? "#ffffff" : "#86868b",
-                          background: isSelected ? "rgba(255, 255, 255, 0.06)" : "transparent",
-                          transition: "background 0.1s ease, color 0.1s ease",
-                        }}
-                        onMouseEnter={(e) => {
-                          if (!isSelected) {
-                            e.currentTarget.style.background = "rgba(255, 255, 255, 0.04)";
-                            e.currentTarget.style.color = "#ffffff";
-                          }
-                        }}
-                        onMouseLeave={(e) => {
-                          if (!isSelected) {
-                            e.currentTarget.style.background = "transparent";
-                            e.currentTarget.style.color = "#86868b";
-                          }
-                        }}
-                      >
-                        <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                          {p.name}
-                        </span>
-                        {isSelected && <span style={{ fontSize: "11px" }}>✓</span>}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-          </div>
 
           {/* Right 2: Minimalist Apple Google Sign-In / User Avatar */}
           <div id="user-menu-container" style={{ position: "relative" }}>

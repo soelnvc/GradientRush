@@ -1,5 +1,9 @@
 # Version History
 
+## Version 1.4.1 (UI: Left-Aligned Workspace Switcher & Centered Navigation)
+- **Left Brand & Workspace Group**: Moved workspace switcher button to the left next to the `GR` logo (`GR / [Workspace ▾]`).
+- **Balanced Apple Navbar**: Clean visual separation across Left (Brand & Workspace), Center (Spacious Nav Links), and Right (Google Profile Avatar).
+
 ## Version 1.4.0 (Major: Firebase Google Auth & Multi-Tenant User Isolation)
 - **Firebase Google Authentication**: 1-click Google Sign-In with popup OAuth flow.
 - **Cryptographic Backend Verification**: FastAPI verifies Firebase ID tokens using `google-auth` on every API request.
