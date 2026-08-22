@@ -1,5 +1,10 @@
 # Version History
 
+## Version 1.3.2 (UI: Seamless Blended Navbar & 63px Height)
+- **Taller Navbar**: Increased navbar height to 63px (+15px) for spacious elegance.
+- **Borderless Aesthetic**: Removed bottom hairline separator for a continuous flow.
+- **Blended Transparent Header**: Navbar blends into the pure black background with frosted glass backdrop blur.
+
 ## Version 1.3.1 (UI: GR 360° Rotating Logo & Apple Workspace Popover)
 - **GR 360° Rotating Logo**: Bold `GR` emblem on the top-left with smooth 360-degree rotation on hover.
 - **Unified Workspace Button**: Single Apple-style pill button on the top-right opening an elevated frosted-glass menu.

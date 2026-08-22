@@ -66,8 +66,7 @@ function Nav() {
           zIndex: 50,
           backdropFilter: "saturate(180%) blur(20px)",
           WebkitBackdropFilter: "saturate(180%) blur(20px)",
-          background: "rgba(0, 0, 0, 0.75)",
-          borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+          background: "transparent",
         }}
       >
         <div
@@ -75,7 +74,7 @@ function Nav() {
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            height: "48px",
+            height: "63px",
             padding: "0 32px",
             maxWidth: "1400px",
             margin: "0 auto",
