@@ -129,13 +129,13 @@ function Nav() {
             </span>
           </NavLink>
 
-          {/* Center: Main Navigation */}
+          {/* Center: Main Navigation with doubled gap */}
           <nav
             style={{
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
-              gap: "40px",
+              gap: "80px",
             }}
           >
             <NavLink to="/" end style={linkStyle}>Overview</NavLink>

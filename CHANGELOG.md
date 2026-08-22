@@ -1,5 +1,9 @@
 # Version History
 
+## Version 1.3.6 (UI: Minimalist Hero Drop Box & Doubled 80px Nav Gap)
+- **Minimalist Hero Drop Box**: Right-aligned dashed drop area for immediate drag & drop or click file ingestion.
+- **Breathable 80px Nav Gap**: Doubled spacing between navigation items for an open, separated Apple look.
+
 ## Version 1.3.5 (UI: Ultra-Minimalist Workspace Switcher)
 - **Zero-AI-Slop Minimalism**: Stripped out glowing dots, gradients, and heavy drop-shadows.
 - **Clean Apple Typography**: Borderless text button (`#86868b` transitioning to `#ffffff` on hover with a subtle `▾`).

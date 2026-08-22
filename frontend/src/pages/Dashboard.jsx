@@ -21,6 +21,7 @@ export default function Dashboard() {
   const { currentProject } = useProject();
   const [sources, setSources] = useState([]);
   const [uploading, setUploading] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const [error, setError] = useState(null);
 
   const fetchSources = useCallback(async () => {
@@ -40,10 +41,8 @@ export default function Dashboard() {
     return () => clearInterval(interval);
   }, [fetchSources]);
 
-  const handleUpload = async (e) => {
-    const files = e.target.files;
-    if (!files.length) return;
-
+  const processUpload = async (files) => {
+    if (!files || !files.length) return;
     setUploading(true);
     setError(null);
 
@@ -56,91 +55,141 @@ export default function Dashboard() {
       setError(e.message);
     } finally {
       setUploading(false);
-      e.target.value = "";
+    }
+  };
+
+  const handleFileInput = async (e) => {
+    await processUpload(e.target.files);
+    e.target.value = "";
+  };
+
+  const handleDrop = async (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      await processUpload(e.dataTransfer.files);
     }
   };
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "56px" }}>
-      {/* Hero Section */}
-      <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <span
+      {/* Hero Section with Left Content & Right Minimalist Drop Box */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: "48px",
+          flexWrap: "wrap",
+        }}
+      >
+        {/* Left: Heading & Description */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "12px", flex: 1, minWidth: "320px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <span
+              style={{
+                fontSize: "11px",
+                fontWeight: "600",
+                textTransform: "uppercase",
+                letterSpacing: "0.05em",
+                padding: "3px 8px",
+                borderRadius: "4px",
+                background: "rgba(255, 255, 255, 0.06)",
+                color: "#a1a1a6",
+              }}
+            >
+              {currentProject ? currentProject.name : "All Workspaces"}
+            </span>
+            <span style={{ fontSize: "12px", color: "#6e6e73" }}>
+              {sources.length} sources
+            </span>
+          </div>
+          <h1
             style={{
-              fontSize: "12px",
+              fontSize: "44px",
               fontWeight: "600",
-              textTransform: "uppercase",
-              letterSpacing: "0.04em",
-              padding: "4px 10px",
-              borderRadius: "980px",
-              background: "rgba(255, 255, 255, 0.08)",
+              letterSpacing: "-0.035em",
               color: "#f5f5f7",
+              lineHeight: 1.1,
+              margin: 0,
             }}
           >
-            {currentProject?.name || "Workspace"}
-          </span>
-          <span style={{ fontSize: "12px", color: "#6e6e73" }}>
-            {sources.length} sources in project
-          </span>
-        </div>
-        <h1
-          style={{
-            fontSize: "44px",
-            fontWeight: "600",
-            letterSpacing: "-0.035em",
-            color: "#f5f5f7",
-            lineHeight: 1.1,
-          }}
-        >
-          Knowledge Engine.
-        </h1>
-        <p
-          style={{
-            fontSize: "20px",
-            fontWeight: "400",
-            color: "#86868b",
-            letterSpacing: "-0.015em",
-            maxWidth: "640px",
-            lineHeight: 1.4,
-          }}
-        >
-          {currentProject?.description || "Multimodal evidence retrieval with provenance-preserving graph expansion across video, audio, PDFs, and vision."}
-        </p>
-
-        {/* Upload Action */}
-        <div style={{ marginTop: "16px" }}>
-          <label
+            Knowledge Engine.
+          </h1>
+          <p
             style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "8px",
-              cursor: uploading ? "not-allowed" : "pointer",
-              padding: "10px 22px",
-              background: "#ffffff",
-              color: "#000000",
-              borderRadius: "980px",
-              fontSize: "14px",
-              fontWeight: "500",
-              letterSpacing: "-0.01em",
-              boxShadow: "0 4px 14px rgba(255, 255, 255, 0.12)",
-              transition: "transform 0.15s ease, opacity 0.15s ease",
-              opacity: uploading ? 0.6 : 1,
+              fontSize: "17px",
+              fontWeight: "400",
+              color: "#86868b",
+              letterSpacing: "-0.015em",
+              maxWidth: "520px",
+              lineHeight: 1.45,
+              margin: 0,
             }}
           >
-            {uploading ? "Ingesting..." : "Upload Sources"}
-            <input
-              type="file"
-              multiple
-              onChange={handleUpload}
-              style={{ display: "none" }}
-              disabled={uploading}
-              accept=".mp4,.avi,.mkv,.mov,.webm,.mp3,.wav,.m4a,.flac,.pdf,.png,.jpg,.jpeg,.webp,.gif,.bmp"
-            />
-          </label>
-          <span style={{ marginLeft: "16px", fontSize: "13px", color: "#6e6e73" }}>
-            MP4, WAV, PDF, PNG supported
-          </span>
+            {currentProject?.description || "Multimodal evidence retrieval with provenance-preserving graph expansion across video, audio, PDFs, and vision."}
+          </p>
         </div>
+
+        {/* Right: Minimalist Apple Drop Box */}
+        <label
+          onDragOver={(e) => {
+            e.preventDefault();
+            setIsDragging(true);
+          }}
+          onDragLeave={() => setIsDragging(false)}
+          onDrop={handleDrop}
+          style={{
+            width: "300px",
+            height: "120px",
+            border: isDragging
+              ? "1px dashed rgba(255, 255, 255, 0.5)"
+              : "1px dashed rgba(255, 255, 255, 0.12)",
+            borderRadius: "14px",
+            background: isDragging
+              ? "rgba(255, 255, 255, 0.06)"
+              : "rgba(255, 255, 255, 0.015)",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "6px",
+            cursor: uploading ? "not-allowed" : "pointer",
+            transition: "all 0.2s ease",
+            userSelect: "none",
+            opacity: uploading ? 0.5 : 1,
+          }}
+          onMouseEnter={(e) => {
+            if (!isDragging) {
+              e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.25)";
+              e.currentTarget.style.background = "rgba(255, 255, 255, 0.03)";
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!isDragging) {
+              e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.12)";
+              e.currentTarget.style.background = "rgba(255, 255, 255, 0.015)";
+            }
+          }}
+        >
+          <input
+            type="file"
+            multiple
+            onChange={handleFileInput}
+            style={{ display: "none" }}
+            disabled={uploading}
+            accept=".mp4,.avi,.mkv,.mov,.webm,.mp3,.wav,.m4a,.flac,.pdf,.png,.jpg,.jpeg,.webp,.gif,.bmp"
+          />
+          <span style={{ fontSize: "16px", color: "#86868b" }}>
+            {uploading ? "⏳" : "↑"}
+          </span>
+          <div style={{ fontSize: "12px", fontWeight: "500", color: "#f5f5f7" }}>
+            {uploading ? "Ingesting source..." : "Drop files here"}
+          </div>
+          <div style={{ fontSize: "11px", color: "#6e6e73" }}>
+            or click to browse • MP4, PDF, PNG
+          </div>
+        </label>
       </div>
 
       {error && (
