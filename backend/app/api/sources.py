@@ -5,12 +5,13 @@ import uuid
 import shutil
 from pathlib import Path
 
-from fastapi import APIRouter, UploadFile, File, Depends, HTTPException, BackgroundTasks
+from typing import Optional
+from fastapi import APIRouter, UploadFile, File, Form, Query, Depends, HTTPException, BackgroundTasks
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 from backend.app.database.connection import get_session
-from backend.app.database.models import Source, SourceType, SourceStatus, Evidence
+from backend.app.database.models import Source, SourceType, SourceStatus, Evidence, Project
 from backend.app.ingestion.pipeline import run_pipeline
 
 router = APIRouter(prefix="/api/sources", tags=["sources"])
@@ -18,6 +19,7 @@ router = APIRouter(prefix="/api/sources", tags=["sources"])
 # Resolve DATA_DIR relative to project root
 DATA_DIR = Path(os.getenv("DATA_DIR", "./data"))
 RAW_DIR = DATA_DIR / "raw"
+DEFAULT_PROJECT_ID = uuid.UUID("00000000-0000-0000-0000-000000000000")
 
 
 def _detect_source_type(filename: str) -> SourceType:
@@ -53,10 +55,18 @@ def _detect_source_type(filename: str) -> SourceType:
 @router.post("/upload")
 async def upload_source(
     file: UploadFile = File(...),
+    project_id: Optional[uuid.UUID] = Form(None),
     session: AsyncSession = Depends(get_session),
 ):
-    """Upload a file and create a source record."""
+    """Upload a file and create a source record assigned to a project workspace."""
     source_type = _detect_source_type(file.filename)
+
+    target_project_id = project_id or DEFAULT_PROJECT_ID
+
+    # Ensure target project exists
+    proj_res = await session.execute(select(Project).where(Project.id == target_project_id))
+    if not proj_res.scalar_one_or_none():
+        target_project_id = DEFAULT_PROJECT_ID
 
     # Save file to data/raw/{source_id}/{filename}
     source_id = uuid.uuid4()
@@ -70,6 +80,7 @@ async def upload_source(
     # Create DB record
     source = Source(
         id=source_id,
+        project_id=target_project_id,
         filename=file.filename,
         source_type=source_type,
         file_path=str(file_path),
@@ -81,6 +92,7 @@ async def upload_source(
 
     return {
         "id": str(source.id),
+        "project_id": str(source.project_id) if source.project_id else None,
         "filename": source.filename,
         "source_type": source.source_type.value,
         "status": source.status.value,
@@ -89,15 +101,22 @@ async def upload_source(
 
 
 @router.get("")
-async def list_sources(session: AsyncSession = Depends(get_session)):
-    """List all sources with their status."""
-    result = await session.execute(
-        select(Source).order_by(Source.created_at.desc())
-    )
+async def list_sources(
+    project_id: Optional[uuid.UUID] = Query(None),
+    session: AsyncSession = Depends(get_session),
+):
+    """List all sources (optionally filtered by project_id) with their status."""
+    stmt = select(Source)
+    if project_id:
+        stmt = stmt.where(Source.project_id == project_id)
+    stmt = stmt.order_by(Source.created_at.desc())
+
+    result = await session.execute(stmt)
     sources = result.scalars().all()
     return [
         {
             "id": str(s.id),
+            "project_id": str(s.project_id) if s.project_id else None,
             "filename": s.filename,
             "source_type": s.source_type.value,
             "status": s.status.value,

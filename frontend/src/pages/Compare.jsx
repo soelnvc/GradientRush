@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { queryKnowledge } from "../api/client";
+import { useProject } from "../context/ProjectContext";
 
 export default function Compare() {
+  const { currentProject } = useProject();
   const [question, setQuestion] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -18,10 +20,10 @@ export default function Compare() {
     setError(null);
 
     try {
-      // Run both queries concurrently
+      // Run both queries concurrently scoped to active project
       const [textRes, multiRes] = await Promise.all([
-        queryKnowledge(question, true),
-        queryKnowledge(question, false)
+        queryKnowledge(question, true, currentProject?.id),
+        queryKnowledge(question, false, currentProject?.id)
       ]);
       
       setTextResult(textRes);

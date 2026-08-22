@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { uploadFile, listSources } from "../api/client";
+import { useProject } from "../context/ProjectContext";
 
 const TYPE_ICONS = {
   video: "🎥",
@@ -17,20 +18,21 @@ const STATUS_COLORS = {
 };
 
 export default function Dashboard() {
+  const { currentProject } = useProject();
   const [sources, setSources] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState(null);
 
   const fetchSources = useCallback(async () => {
     try {
-      const data = await listSources();
+      const data = await listSources(currentProject?.id);
       setSources(data);
       setError(null);
     } catch (e) {
       console.error("Failed to fetch sources", e);
       setError(e.message);
     }
-  }, []);
+  }, [currentProject?.id]);
 
   useEffect(() => {
     fetchSources();
@@ -47,7 +49,7 @@ export default function Dashboard() {
 
     try {
       for (const file of files) {
-        await uploadFile(file);
+        await uploadFile(file, currentProject?.id);
       }
       await fetchSources();
     } catch (e) {
@@ -62,6 +64,25 @@ export default function Dashboard() {
     <div style={{ display: "flex", flexDirection: "column", gap: "56px" }}>
       {/* Hero Section */}
       <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <span
+            style={{
+              fontSize: "12px",
+              fontWeight: "600",
+              textTransform: "uppercase",
+              letterSpacing: "0.04em",
+              padding: "4px 10px",
+              borderRadius: "980px",
+              background: "rgba(255, 255, 255, 0.08)",
+              color: "#f5f5f7",
+            }}
+          >
+            {currentProject?.name || "Workspace"}
+          </span>
+          <span style={{ fontSize: "12px", color: "#6e6e73" }}>
+            {sources.length} sources in project
+          </span>
+        </div>
         <h1
           style={{
             fontSize: "44px",
@@ -83,7 +104,7 @@ export default function Dashboard() {
             lineHeight: 1.4,
           }}
         >
-          Multimodal evidence retrieval with provenance-preserving graph expansion across video, audio, PDFs, and vision.
+          {currentProject?.description || "Multimodal evidence retrieval with provenance-preserving graph expansion across video, audio, PDFs, and vision."}
         </p>
 
         {/* Upload Action */}

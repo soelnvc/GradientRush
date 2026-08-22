@@ -1,23 +1,18 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { listSources } from "../api/client";
-
-const TYPE_ICONS = {
-  video: "🎥",
-  audio: "🎙",
-  pdf: "📄",
-  image: "🖼",
-};
+import { useProject } from "../context/ProjectContext";
 
 export default function Sources() {
+  const { currentProject } = useProject();
   const [sources, setSources] = useState([]);
 
   useEffect(() => {
-    const fetchSources = () => listSources().then(setSources).catch(console.error);
+    const fetchSources = () => listSources(currentProject?.id).then(setSources).catch(console.error);
     fetchSources();
     const interval = setInterval(fetchSources, 3000);
     return () => clearInterval(interval);
-  }, []);
+  }, [currentProject?.id]);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "32px" }}>

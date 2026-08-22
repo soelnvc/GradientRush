@@ -1,5 +1,11 @@
 # Version History
 
+## Version 1.3.0 (Major: Project-Based Context Isolation & Workspace Bifurcation)
+- **Project Workspaces**: Added `projects` entity and relational foreign key scoping across `sources`, `evidence`, and `evidence_relationships`.
+- **Scoped Ingestion & Retrieval**: Automatic isolation of file uploads, vector similarity searches, and graph relationship expansions per project.
+- **Top Navigation Workspace Switcher**: Apple-style project selector dropdown and `+ New Workspace` modal.
+- **100% Context Isolation**: Verified that searches in Workspace A never cross-contaminate or leak into Workspace B.
+
 ## Version 1.2.1 (Resilience: 5-Level Deep AI Model Fallback Architecture)
 - **5-Tier Cloud Model Fallback**: Implemented automated cascading across `gemini-3.7-flash` → `gemini-3.6-flash` → `gemini-3.5-flash` → `gemini-3.5-flash-lite` → `gemini-3.1-flash-lite`.
 - **Zero-Downtime Deterministic Fallback**: Automatic extractive fallback so queries never fail even if all cloud API quotas are exhausted.

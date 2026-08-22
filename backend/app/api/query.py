@@ -1,5 +1,5 @@
-"""Query API — Cross-Modal RAG pipeline with Provenance."""
-
+import uuid
+from typing import Optional
 from pydantic import BaseModel, Field
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -16,21 +16,28 @@ class QueryRequest(BaseModel):
     question: str = Field(..., description="Query question")
     limit: int = Field(5, ge=1, le=50, description="Top-K evidence items to retrieve")
     text_only_baseline: bool = Field(False, description="If True, bypasses multimodal expansion and limits search to text")
+    project_id: Optional[uuid.UUID] = Field(None, description="Optional Project ID to scope the query context")
 
 @router.post("")
 async def query_knowledge(
     request: QueryRequest,
     session: AsyncSession = Depends(get_session)
 ):
-    """Level 7 & 8: Cross-Modal RAG query endpoint with Provenance (and Level 11 Baseline)."""
+    """Level 7 & 8: Cross-Modal RAG query endpoint with Provenance and Project isolation."""
     q = request.question.strip()
     if not q:
         raise HTTPException(status_code=400, detail="Question cannot be empty or blank")
 
-    # 1. Retrieve initial evidence
+    # 1. Retrieve initial evidence scoped to project
     try:
         modalities = ["pdf_text", "ocr"] if request.text_only_baseline else None
-        initial_results = await search_evidence(session, q, request.limit, modalities=modalities)
+        initial_results = await search_evidence(
+            session,
+            q,
+            request.limit,
+            modalities=modalities,
+            project_id=request.project_id,
+        )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Retrieval error: {str(e)}")
 

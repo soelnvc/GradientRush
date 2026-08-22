@@ -1,13 +1,19 @@
-"""Vector search and retrieval."""
-
+import uuid
+from typing import Optional, List
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from backend.app.database.models import Evidence
+from backend.app.database.models import Evidence, Source
 from backend.app.services.embeddings import generate_embedding
 
 
-async def search_evidence(session: AsyncSession, query: str, limit: int = 5, modalities: list[str] = None) -> list[tuple[Evidence, float]]:
-    """Retrieve the most relevant evidence for a given query along with cosine distance."""
+async def search_evidence(
+    session: AsyncSession,
+    query: str,
+    limit: int = 5,
+    modalities: list[str] = None,
+    project_id: Optional[uuid.UUID] = None,
+) -> list[tuple[Evidence, float]]:
+    """Retrieve the most relevant evidence for a given query scoped to a project."""
     if not query or not query.strip():
         return []
 
@@ -15,9 +21,12 @@ async def search_evidence(session: AsyncSession, query: str, limit: int = 5, mod
     query_embedding = generate_embedding(query.strip())
 
     distance_col = Evidence.embedding.cosine_distance(query_embedding).label("distance")
-    
+
     stmt = select(Evidence, distance_col).where(Evidence.embedding.isnot(None))
-    
+
+    if project_id:
+        stmt = stmt.join(Source, Evidence.source_id == Source.id).where(Source.project_id == project_id)
+
     if modalities:
         stmt = stmt.where(Evidence.modality.in_(modalities))
 

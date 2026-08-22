@@ -26,8 +26,36 @@ async def get_session() -> AsyncSession:
 
 
 async def init_db():
-    """Create all tables and enable pgvector extension."""
+    """Create all tables, enable pgvector extension, and initialize default workspace."""
     async with engine.begin() as conn:
         await conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
-        from backend.app.database.models import Source, Evidence, EvidenceRelationship  # noqa: F401
+        from backend.app.database.models import Project, Source, Evidence, EvidenceRelationship  # noqa: F401
         await conn.run_sync(Base.metadata.create_all)
+
+        # Migration: ensure project_id column exists on sources
+        await conn.execute(
+            text(
+                "ALTER TABLE sources ADD COLUMN IF NOT EXISTS project_id UUID REFERENCES projects(id) ON DELETE CASCADE"
+            )
+        )
+
+        # Ensure default project exists
+        default_project_id = "00000000-0000-0000-0000-000000000000"
+        await conn.execute(
+            text(
+                """
+                INSERT INTO projects (id, name, description, created_at)
+                VALUES (:id, 'System Design Workspace', 'Default workspace for system architecture, video, and documents', NOW())
+                ON CONFLICT (id) DO NOTHING
+                """
+            ),
+            {"id": default_project_id},
+        )
+
+        # Assign existing legacy sources without a project_id to the default workspace
+        await conn.execute(
+            text(
+                "UPDATE sources SET project_id = :id WHERE project_id IS NULL"
+            ),
+            {"id": default_project_id},
+        )

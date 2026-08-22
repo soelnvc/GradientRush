@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from backend.app.database.connection import init_db
+from backend.app.api.projects import router as projects_router
 from backend.app.api.sources import router as sources_router
 from backend.app.api.query import router as query_router
 
@@ -23,7 +24,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="Multimodal Knowledge Engine",
     description="Evidence retrieval system preserving cross-modal relationships",
-    version="0.1.0",
+    version="1.2.1",
     lifespan=lifespan,
 )
 
@@ -41,6 +42,7 @@ import os
 from pathlib import Path
 
 # Routes
+app.include_router(projects_router)
 app.include_router(sources_router)
 app.include_router(query_router)
 

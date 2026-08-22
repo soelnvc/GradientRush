@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { queryKnowledge } from "../api/client";
+import { useProject } from "../context/ProjectContext";
 
 export default function Query() {
+  const { currentProject } = useProject();
   const [question, setQuestion] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
@@ -17,7 +19,7 @@ export default function Query() {
     setResult(null);
 
     try {
-      const data = await queryKnowledge(question);
+      const data = await queryKnowledge(question, false, currentProject?.id);
       setResult(data);
     } catch (e) {
       setError(e.message);
@@ -29,11 +31,19 @@ export default function Query() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "40px" }}>
       <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <span style={{ fontSize: "11px", fontWeight: "600", color: "#86868b", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+            Workspace Context:
+          </span>
+          <span style={{ fontSize: "12px", color: "#ffffff", fontWeight: "500" }}>
+            {currentProject?.name || "All Sources"}
+          </span>
+        </div>
         <h1 style={{ fontSize: "36px", fontWeight: "600", color: "#f5f5f7", letterSpacing: "-0.03em" }}>
           Query Engine
         </h1>
         <p style={{ color: "#86868b", fontSize: "16px" }}>
-          Search across speech, documents, diagrams, and video frames with strict evidence grounding.
+          Search across speech, documents, diagrams, and video frames within this workspace.
         </p>
       </div>
 
