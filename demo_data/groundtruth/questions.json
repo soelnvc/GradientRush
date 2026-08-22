@@ -1,0 +1,123 @@
+{
+  "test_cases": [
+    {
+      "id": "Q1",
+      "question": "Why is database replication used?",
+      "ground_truth_answer": "Database replication is used to protect against data loss during system failures, handle increased traffic by scaling reads horizontally, and improve latency by routing user requests to the physically closest regional node.",
+      "expected_evidence": {
+        "sources": [
+          {
+            "source_title": "Database Replication Explained (in 5 Minutes)",
+            "type": "YouTube Video Transcript",
+            "timestamp": "01:23",
+            "quote": "to protect against data loss during system failures to serve increased traffic or even to improve latency when pursuing a regional strategy"
+          }
+        ],
+        "artifacts": [
+          {
+            "artifact_name": "architecture_brief.pdf",
+            "location": "Page 1 & 2 (Section 2: Why Database Replication is Essential)",
+            "key_points": [
+              "Protecting Against Data Loss: Ensures high durability by maintaining redundant copies of the dataset.",
+              "Serving Increased Traffic: Enables horizontal read scaling by separating write operations from read operations.",
+              "Improving Latency (Regional Strategy): Geographic distribution allows routing client requests to the physically closest node."
+            ]
+          },
+          {
+            "artifact_name": "meeting_notes.pdf",
+            "location": "Page 1 (Identified Bottlenecks & Recommended Architectural Model)",
+            "key_points": [
+              "Mitigates single point of failure (SPOF) risks of a single node.",
+              "Resolves regional latency issues for global database users."
+            ]
+          }
+        ]
+      },
+      "evaluation_criteria": {
+        "required_concepts": [
+          "durability / preventing data loss / fault tolerance",
+          "traffic scalability / read scaling",
+          "network latency / regional replication"
+        ]
+      }
+    },
+    {
+      "id": "Q2",
+      "question": "What architecture is shown when replication is discussed?",
+      "ground_truth_answer": "The primary architecture shown is the Leader-Follower (also known as Primary-Replica) model. In this setup, all write transactions are sent to a single designated leader database, which processes them locally and then propagates the updates to follower replicas. Clients can read from any of the followers.",
+      "expected_evidence": {
+        "sources": [
+          {
+            "source_title": "Database Replication Explained (in 5 Minutes)",
+            "type": "YouTube Video Transcript / Visual Frame",
+            "timestamp": "02:41 (Transcript) & 02:45 (Video Frame)",
+            "quote": "first there is the leader follower strategy also known as primary replica this is probably the most common strategy where a query writes to a single designated leader the leader then replicates the updated data to followers"
+          }
+        ],
+        "artifacts": [
+          {
+            "artifact_name": "architecture_brief.pdf",
+            "location": "Page 1 & 2 (Section 3: Core Replication Architecture Models)",
+            "key_points": [
+              "Leader-Follower (Primary-Replica): Writes are routed exclusively to a single, designated leader database; updates cascade to followers."
+            ]
+          },
+          {
+            "artifact_name": "meeting_notes.pdf",
+            "location": "Page 1 & 2 (Recommended Architectural Model & Node Roles Table)",
+            "key_points": [
+              "Recommended Model: Primary -> Replicas setup where primary accepts writes and replicas serve read requests."
+            ]
+          }
+        ]
+      },
+      "evaluation_criteria": {
+        "required_concepts": [
+          "Leader-Follower / Primary-Replica / Master-Slave",
+          "Writes processed by a single leader / primary",
+          "Followers / replicas receive cascading updates"
+        ]
+      }
+    },
+    {
+      "id": "Q3",
+      "question": "How does the architecture address the scalability problem?",
+      "ground_truth_answer": "Replication addresses the scalability problem by separating read and write workloads. Rather than forcing a single node to handle both, high-volume read traffic is routed to horizontal follower replicas, offloading the primary leader so it can focus entirely on write operations.",
+      "expected_evidence": {
+        "sources": [
+          {
+            "source_title": "Database Replication Explained (in 5 Minutes)",
+            "type": "YouTube Video Transcript / Visual Frame",
+            "timestamp": "03:10 (Transcript) & 03:18 (Video Frame)",
+            "quote": "asynchronous replication may be an option for use cases where transaction speed is more important... proactive strategy to help applications scale"
+          }
+        ],
+        "artifacts": [
+          {
+            "artifact_name": "architecture_brief.pdf",
+            "location": "Page 1 & 3 (Section 2 & 7: Strategic Trade-offs)",
+            "key_points": [
+              "Enables horizontal read scaling by allowing write operations to be separated from read operations.",
+              "Offloads read queries to geographically near replicas to handle high-volume traffic with minimal latency."
+            ]
+          },
+          {
+            "artifact_name": "meeting_notes.pdf",
+            "location": "Page 1 & 2 (Discussion & Recommended Architectural Model)",
+            "key_points": [
+              "Isolates read traffic to dedicated replicas, shielding the primary from high concurrent read load.",
+              "Enables horizontal read scaling."
+            ]
+          }
+        ]
+      },
+      "evaluation_criteria": {
+        "required_concepts": [
+          "separating / isolating reads and writes",
+          "horizontal scaling / offloading read traffic to replicas",
+          "preventing the primary/leader node from being overwhelmed"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+"""FastAPI application — Multimodal Knowledge Engine."""
+
+from contextlib import asynccontextmanager
+
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from dotenv import load_dotenv
+
+load_dotenv()
+
+from backend.app.database.connection import init_db
+from backend.app.api.sources import router as sources_router
+from backend.app.api.query import router as query_router
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Initialize database on startup."""
+    await init_db()
+    yield
+
+
+app = FastAPI(
+    title="Multimodal Knowledge Engine",
+    description="Evidence retrieval system preserving cross-modal relationships",
+    version="0.1.0",
+    lifespan=lifespan,
+)
+
+# CORS — allow frontend dev server
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173", "http://localhost:5174", "http://127.0.0.1:5173", "http://127.0.0.1:5174"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Routes
+app.include_router(sources_router)
+app.include_router(query_router)
+
+
+@app.get("/health")
+async def health():
+    return {"status": "ok", "service": "multimodal-knowledge-engine"}

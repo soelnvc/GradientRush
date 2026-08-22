@@ -1,0 +1,62 @@
+[
+  {
+    "id": "Q1",
+    "question": "Why is database replication used?",
+    "expected_evidence_ids": ["a0000000-0000-0000-0000-000000000001"],
+    "description": "PDF text on read scalability and fault tolerance"
+  },
+  {
+    "id": "Q2",
+    "question": "How does database sharding address write bottlenecks?",
+    "expected_evidence_ids": ["a0000000-0000-0000-0000-000000000002"],
+    "description": "PDF text on partitioning across nodes"
+  },
+  {
+    "id": "Q3",
+    "question": "What vector indexing algorithms are supported by pgvector?",
+    "expected_evidence_ids": ["a0000000-0000-0000-0000-000000000003"],
+    "description": "PDF text on HNSW and IVFFlat"
+  },
+  {
+    "id": "Q4",
+    "question": "What did Alice recommend for caching and low latency?",
+    "expected_evidence_ids": ["b0000000-0000-0000-0000-000000000001"],
+    "description": "Speech transcript about Redis write-through cache"
+  },
+  {
+    "id": "Q5",
+    "question": "What concern did Bob raise about replication lag?",
+    "expected_evidence_ids": ["b0000000-0000-0000-0000-000000000002"],
+    "description": "Speech transcript on network partitions and lag"
+  },
+  {
+    "id": "Q6",
+    "question": "Is there a diagram showing read traffic directed to read replicas?",
+    "expected_evidence_ids": ["c0000000-0000-0000-0000-000000000001"],
+    "description": "Video frame slide of leader node and 3 read replicas"
+  },
+  {
+    "id": "Q7",
+    "question": "Where is the microservices topology with API gateway illustrated?",
+    "expected_evidence_ids": ["d0000000-0000-0000-0000-000000000001"],
+    "description": "Image diagram of microservices architecture"
+  },
+  {
+    "id": "Q8",
+    "question": "How can we scale read queries across multiple database servers?",
+    "expected_evidence_ids": ["a0000000-0000-0000-0000-000000000001", "c0000000-0000-0000-0000-000000000001"],
+    "description": "Replication text or architecture diagram"
+  },
+  {
+    "id": "Q9",
+    "question": "What caching solution provides latency below 5 milliseconds?",
+    "expected_evidence_ids": ["b0000000-0000-0000-0000-000000000001"],
+    "description": "Speech transcript mentioning Redis <5ms"
+  },
+  {
+    "id": "Q10",
+    "question": "Which indexing techniques provide approximate nearest neighbor search?",
+    "expected_evidence_ids": ["a0000000-0000-0000-0000-000000000003"],
+    "description": "PDF page 3 on pgvector ANN search"
+  }
+]
