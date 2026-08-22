@@ -72,7 +72,7 @@ export default function Query() {
         </p>
       </div>
 
-      <form onSubmit={handleSearch} style={{ display: "flex", alignItems: "flex-end", gap: "12px", width: "100%" }}>
+      <form onSubmit={handleSearch} style={{ display: "flex", alignItems: "flex-start", gap: "12px", width: "100%" }}>
         <div style={{ flex: 1, position: "relative" }}>
           <textarea
             ref={textareaRef}
