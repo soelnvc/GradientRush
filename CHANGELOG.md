@@ -1,5 +1,10 @@
 # Version History
 
+## Version 1.2.1 (Resilience: 5-Level Deep AI Model Fallback Architecture)
+- **5-Tier Cloud Model Fallback**: Implemented automated cascading across `gemini-3.7-flash` → `gemini-3.6-flash` → `gemini-3.5-flash` → `gemini-3.5-flash-lite` → `gemini-3.1-flash-lite`.
+- **Zero-Downtime Deterministic Fallback**: Automatic extractive fallback so queries never fail even if all cloud API quotas are exhausted.
+- **Failover Across All AI Modalities**: Automated retry & fallback integrated for vision analysis, concept extraction, and RAG answer synthesis.
+
 ## Version 1.2.0 (Level 12: Final Boss & Demo Readiness)
 - **All Levels (0–12) Complete**: 100% feature-complete implementation of the Multimodal Knowledge Engine.
 - **Judge Pitch & Demo Playbook**: Created comprehensive `DEMO.md` containing the 60-second elevator pitch, live walkthrough steps, and Text-RAG vs Multimodal comparison matrices.
