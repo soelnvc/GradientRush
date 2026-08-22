@@ -6,7 +6,7 @@ from backend.app.database.models import Evidence
 from backend.app.services.embeddings import generate_embedding
 
 
-async def search_evidence(session: AsyncSession, query: str, limit: int = 5) -> list[tuple[Evidence, float]]:
+async def search_evidence(session: AsyncSession, query: str, limit: int = 5, modalities: list[str] = None) -> list[tuple[Evidence, float]]:
     """Retrieve the most relevant evidence for a given query along with cosine distance."""
     if not query or not query.strip():
         return []
@@ -15,14 +15,16 @@ async def search_evidence(session: AsyncSession, query: str, limit: int = 5) -> 
     query_embedding = generate_embedding(query.strip())
 
     distance_col = Evidence.embedding.cosine_distance(query_embedding).label("distance")
+    
+    stmt = select(Evidence, distance_col).where(Evidence.embedding.isnot(None))
+    
+    if modalities:
+        stmt = stmt.where(Evidence.modality.in_(modalities))
 
     # Cosine distance search using pgvector
     # smaller distance = higher similarity
     result = await session.execute(
-        select(Evidence, distance_col)
-        .where(Evidence.embedding.isnot(None))
-        .order_by(distance_col.asc())
-        .limit(limit)
+        stmt.order_by(distance_col.asc()).limit(limit)
     )
 
     rows = result.all()

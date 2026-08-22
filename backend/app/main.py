@@ -36,9 +36,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+from fastapi.staticfiles import StaticFiles
+import os
+from pathlib import Path
+
 # Routes
 app.include_router(sources_router)
 app.include_router(query_router)
+
+# Static files for media viewing
+DATA_DIR = Path(os.getenv("DATA_DIR", "./data"))
+app.mount("/data", StaticFiles(directory=DATA_DIR), name="data")
 
 
 @app.get("/health")

@@ -70,16 +70,18 @@ async def generate_semantic_relationships(session: AsyncSession, source_id: uuid
     )
     evidence_items = result.scalars().all()
     
-    # Extract entities for each evidence item
+    # Extract entities/key concepts for each evidence item quickly
+    import re
+    STOPWORDS = {"this", "that", "with", "from", "have", "what", "when", "where", "which", "there", "their", "about", "would", "could", "should", "using", "used", "into", "also", "some", "more"}
+    
     evidence_entities = {}
     for e in evidence_items:
-        # Minimal extraction just to link concepts
-        entities = ai_provider.extract_entities(e.content)
-        if entities:
-            evidence_entities[e.id] = set(entities)
-            # Store entities in metadata for later use
+        words = re.findall(r"\b[A-Za-z]{4,}\b", e.content.lower())
+        meaningful = {w for w in words if w not in STOPWORDS}
+        if meaningful:
+            evidence_entities[e.id] = meaningful
             e.metadata_ = e.metadata_ or {}
-            e.metadata_["entities"] = list(entities)
+            e.metadata_["entities"] = list(meaningful)[:10]
     
     relationships = []
     

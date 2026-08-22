@@ -1,74 +1,82 @@
-"""A5. Automated Retrieval Evaluation."""
+"""Level 10: Automated Ground Truth Evaluation for Multimodal RAG."""
 
 import json
+import asyncio
 from pathlib import Path
-import pytest
-from sqlalchemy.ext.asyncio import AsyncSession
-from backend.app.retrieval.search import search_evidence
+import httpx
 
+# Resolve directories
+BASE_DIR = Path(__file__).parent.parent.parent.parent
+QUESTIONS_FILE = BASE_DIR / "demo_data/groundtruth/questions.json"
+API_BASE = "http://localhost:8000"
 
-@pytest.mark.asyncio
-async def test_retrieval_hit_rates(session: AsyncSession, seed_demo_corpus):
-    """A5: Evaluate Top-1, Top-3, Top-5 hit rate and MRR against ground truth."""
-    eval_file = Path(__file__).parent / "questions.json"
-    with open(eval_file, "r") as f:
-        questions = json.load(f)
+async def run_evaluation():
+    with open(QUESTIONS_FILE, "r") as f:
+        data = json.load(f)
+        
+    test_cases = data.get("test_cases", [])
+    print(f"\n========================================================")
+    print(f"LEVEL 10: MULTIMODAL RAG GROUND TRUTH EVALUATION")
+    print(f"========================================================")
+    print(f"Loaded {len(test_cases)} test cases.\n")
+    
+    passed_cases = 0
+    total_cases = len(test_cases)
+    
+    async with httpx.AsyncClient() as client:
+        for tc in test_cases:
+            q_id = tc["id"]
+            question = tc["question"]
+            required_concepts = tc.get("evaluation_criteria", {}).get("required_concepts", [])
+            
+            print(f"[{q_id}] Query: '{question}'")
+            try:
+                res = await client.post(f"{API_BASE}/api/query", json={"question": question}, timeout=60.0)
+                if res.status_code != 200:
+                    print(f"  ❌ Failed with status {res.status_code}")
+                    continue
+                
+                result = res.json()
+                answer = result["answer"].lower()
+                evidence_list = result["evidence"]
+                
+                # Check for multimodal evidence (cross-modal RAG success)
+                modalities = {e["modality"] for e in evidence_list}
+                
+                # Check concepts
+                concepts_found = []
+                concepts_missing = []
+                for concept in required_concepts:
+                    # Loose matching for evaluation
+                    tokens = [t.strip().lower() for t in concept.split("/")]
+                    if any(t in answer for t in tokens):
+                        concepts_found.append(concept)
+                    else:
+                        concepts_missing.append(concept)
+                
+                # Success criteria: 
+                # 1. Answer has all concepts
+                # 2. Evidence spans more than 1 modality (proving cross-modal expansion worked)
+                if len(concepts_missing) == 0 and len(modalities) > 1:
+                    print("  ✅ PASS: Answer covers all required concepts and uses multimodal evidence.")
+                    passed_cases += 1
+                else:
+                    print(f"  ❌ FAIL:")
+                    if len(concepts_missing) > 0:
+                        print(f"      Missing concepts: {concepts_missing}")
+                    if len(modalities) <= 1:
+                        print(f"      Expected multimodal evidence, found only: {modalities}")
+                        
+            except Exception as e:
+                print(f"  ❌ ERROR: {e}")
+                
+            print("-" * 56)
+            
+    print(f"\nEvaluation Complete: {passed_cases}/{total_cases} tests passed.")
+    print(f"========================================================\n")
+    
+    # Assert for automated runners
+    assert passed_cases == total_cases, f"Only {passed_cases}/{total_cases} passed."
 
-    total_questions = len(questions)
-    top1_hits = 0
-    top3_hits = 0
-    top5_hits = 0
-    reciprocal_ranks = []
-
-    print("\n" + "=" * 70)
-    print("LEVEL 6 RETRIEVAL EVALUATION REPORT")
-    print("=" * 70)
-    print(f"{'ID':<5} | {'Question':<45} | {'Best Rank':<10} | {'Hit?':<5}")
-    print("-" * 70)
-
-    for item in questions:
-        q_id = item["id"]
-        q_text = item["question"]
-        expected_ids = set(item["expected_evidence_ids"])
-
-        results = await search_evidence(session, q_text, limit=5)
-        retrieved_ids = [str(ev.id) for ev, _ in results]
-
-        # Calculate rank
-        rank = None
-        for i, r_id in enumerate(retrieved_ids):
-            if r_id in expected_ids:
-                rank = i + 1
-                break
-
-        if rank is not None:
-            reciprocal_ranks.append(1.0 / rank)
-            if rank <= 1:
-                top1_hits += 1
-            if rank <= 3:
-                top3_hits += 1
-            if rank <= 5:
-                top5_hits += 1
-            status = "✅ PASS"
-            rank_str = f"#{rank}"
-        else:
-            reciprocal_ranks.append(0.0)
-            status = "❌ MISS"
-            rank_str = "N/A"
-
-        print(f"{q_id:<5} | {q_text[:45]:<45} | {rank_str:<10} | {status:<5}")
-
-    top1_rate = (top1_hits / total_questions) * 100.0
-    top3_rate = (top3_hits / total_questions) * 100.0
-    top5_rate = (top5_hits / total_questions) * 100.0
-    mrr = sum(reciprocal_ranks) / total_questions
-
-    print("-" * 70)
-    print(f"Top-1 Hit Rate: {top1_rate:.1f}% ({top1_hits}/{total_questions})")
-    print(f"Top-3 Hit Rate: {top3_rate:.1f}% ({top3_hits}/{total_questions})")
-    print(f"Top-5 Hit Rate: {top5_rate:.1f}% ({top5_hits}/{total_questions})")
-    print(f"Mean Reciprocal Rank (MRR): {mrr:.3f}")
-    print("=" * 70 + "\n")
-
-    # Hackathon target from level6_val.md: Top-5 hit rate >= 80%
-    assert top5_rate >= 80.0, f"Top-5 hit rate {top5_rate}% is below 80% target"
+if __name__ == "__main__":
+    asyncio.run(run_evaluation())

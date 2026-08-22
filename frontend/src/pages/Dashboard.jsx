@@ -25,13 +25,17 @@ export default function Dashboard() {
     try {
       const data = await listSources();
       setSources(data);
+      setError(null);
     } catch (e) {
+      console.error("Failed to fetch sources", e);
       setError(e.message);
     }
   }, []);
 
   useEffect(() => {
     fetchSources();
+    const interval = setInterval(fetchSources, 3000);
+    return () => clearInterval(interval);
   }, [fetchSources]);
 
   const handleUpload = async (e) => {

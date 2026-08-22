@@ -1,10 +1,15 @@
-import { BrowserRouter, Routes, Route, NavLink } from "react-router-dom";
+import { BrowserRouter, Routes, Route, NavLink, useLocation } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import Sources from "./pages/Sources";
 import SourceDetail from "./pages/SourceDetail";
 import Query from "./pages/Query";
+import Compare from "./pages/Compare";
 
 function Nav() {
+  const location = useLocation();
+  // Don't show nav in SourceDetail to maximize screen space
+  if (location.pathname.startsWith('/sources/') && location.pathname !== '/sources') return null;
+
   const linkStyle = ({ isActive }) => ({
     color: isActive ? "#60a5fa" : "#888",
     textDecoration: "none",
@@ -21,15 +26,10 @@ function Nav() {
         marginBottom: 24,
       }}
     >
-      <NavLink to="/" end style={linkStyle}>
-        Dashboard
-      </NavLink>
-      <NavLink to="/sources" style={linkStyle}>
-        Sources
-      </NavLink>
-      <NavLink to="/query" style={linkStyle}>
-        Query
-      </NavLink>
+      <NavLink to="/" end style={linkStyle}>Dashboard</NavLink>
+      <NavLink to="/sources" end style={linkStyle}>Sources</NavLink>
+      <NavLink to="/query" style={linkStyle}>Query</NavLink>
+      <NavLink to="/compare" style={linkStyle}>Evaluate Baseline</NavLink>
     </nav>
   );
 }
@@ -39,7 +39,7 @@ export default function App() {
     <BrowserRouter>
       <div
         style={{
-          maxWidth: 960,
+          maxWidth: "100%",
           margin: "0 auto",
           padding: "0 24px",
           minHeight: "100vh",
@@ -51,6 +51,7 @@ export default function App() {
           <Route path="/sources" element={<Sources />} />
           <Route path="/sources/:id" element={<SourceDetail />} />
           <Route path="/query" element={<Query />} />
+          <Route path="/compare" element={<Compare />} />
         </Routes>
       </div>
     </BrowserRouter>

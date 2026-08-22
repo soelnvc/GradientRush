@@ -18,11 +18,13 @@ def get_whisper_model():
         _whisper_model = whisper.load_model(model_size)
     return _whisper_model
 
+import asyncio
+
 async def process_audio(session: AsyncSession, source_id: uuid.UUID, file_path: str):
     """Transcribe audio and create speech evidence segments."""
     
     model = get_whisper_model()
-    result = model.transcribe(file_path)
+    result = await asyncio.to_thread(model.transcribe, file_path)
     
     segments = result.get("segments", [])
     for segment in segments:

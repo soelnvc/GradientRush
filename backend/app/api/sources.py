@@ -137,19 +137,37 @@ async def get_source(
     }
 
 
+from backend.app.database.connection import async_session
+
+async def _bg_run_pipeline(source_id: uuid.UUID):
+    async with async_session() as session:
+        try:
+            await run_pipeline(session, source_id)
+        except Exception as e:
+            print(f"Background pipeline error for source {source_id}: {e}")
+
+
 @router.post("/{source_id}/process")
 async def process_source(
     source_id: uuid.UUID,
+    background_tasks: BackgroundTasks,
     session: AsyncSession = Depends(get_session),
 ):
-    """Trigger synchronous processing for a source."""
-    try:
-        await run_pipeline(session, source_id)
-        return {"status": "success", "message": "Source processed successfully"}
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Processing failed: {str(e)}")
+    """Trigger asynchronous background processing for a source."""
+    result = await session.execute(select(Source).where(Source.id == source_id))
+    source = result.scalar_one_or_none()
+    if not source:
+        raise HTTPException(status_code=404, detail="Source not found")
+
+    if source.status == SourceStatus.COMPLETED:
+        return {"status": "completed", "message": "Source is already processed"}
+
+    source.status = SourceStatus.PROCESSING
+    source.error_message = None
+    await session.commit()
+
+    background_tasks.add_task(_bg_run_pipeline, source_id)
+    return {"status": "processing", "message": "Source processing started in background"}
 
 
 @router.get("/{source_id}/evidence")

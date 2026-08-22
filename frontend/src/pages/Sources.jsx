@@ -13,7 +13,10 @@ export default function Sources() {
   const [sources, setSources] = useState([]);
 
   useEffect(() => {
-    listSources().then(setSources);
+    const fetchSources = () => listSources().then(setSources).catch(console.error);
+    fetchSources();
+    const interval = setInterval(fetchSources, 3000);
+    return () => clearInterval(interval);
   }, []);
 
   return (

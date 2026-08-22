@@ -1,4 +1,4 @@
-const API_BASE = "http://localhost:8000";
+const API_BASE = "";
 
 export async function uploadFile(file) {
   const formData = new FormData();
@@ -37,11 +37,11 @@ export async function processSource(id) {
   return res.json();
 }
 
-export async function queryKnowledge(question) {
+export async function queryKnowledge(question, textOnlyBaseline = false) {
   const res = await fetch(`${API_BASE}/api/query`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ question }),
+    body: JSON.stringify({ question, text_only_baseline: textOnlyBaseline }),
   });
   if (!res.ok) throw new Error("Query failed");
   return res.json();
