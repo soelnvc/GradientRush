@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.database.connection import get_session
 from backend.app.database.models import Project, Source, Evidence
+from backend.app.auth.verifier import get_current_user_optional, AuthenticatedUser
 
 router = APIRouter(prefix="/api/projects", tags=["projects"])
 
@@ -32,10 +33,17 @@ class ProjectResponse(BaseModel):
 
 
 @router.get("", response_model=list[ProjectResponse])
-async def list_projects(session: AsyncSession = Depends(get_session)):
-    """List all projects/workspaces with source and evidence counts."""
-    # Query projects
-    result = await session.execute(select(Project).order_by(Project.created_at.desc()))
+async def list_projects(
+    session: AsyncSession = Depends(get_session),
+    current_user: Optional[AuthenticatedUser] = Depends(get_current_user_optional),
+):
+    """List all projects/workspaces for current user with source and evidence counts."""
+    stmt = select(Project)
+    if current_user:
+        stmt = stmt.where((Project.user_id == current_user.user_id) | (Project.user_id.is_(None)))
+    stmt = stmt.order_by(Project.created_at.desc())
+
+    result = await session.execute(stmt)
     projects = result.scalars().all()
 
     project_list = []
@@ -72,14 +80,16 @@ async def list_projects(session: AsyncSession = Depends(get_session)):
 async def create_project(
     data: ProjectCreate,
     session: AsyncSession = Depends(get_session),
+    current_user: Optional[AuthenticatedUser] = Depends(get_current_user_optional),
 ):
-    """Create a new project workspace."""
+    """Create a new project workspace scoped to current user."""
     if not data.name.strip():
         raise HTTPException(status_code=400, detail="Project name cannot be empty")
 
     new_project = Project(
         name=data.name.strip(),
         description=data.description.strip() if data.description else None,
+        user_id=current_user.user_id if current_user else None,
     )
     session.add(new_project)
     await session.commit()

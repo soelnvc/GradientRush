@@ -32,7 +32,17 @@ async def init_db():
         from backend.app.database.models import Project, Source, Evidence, EvidenceRelationship  # noqa: F401
         await conn.run_sync(Base.metadata.create_all)
 
-        # Migration: ensure project_id column exists on sources
+        # Migration: ensure project_id column exists on sources, and user_id on projects
+        await conn.execute(
+            text(
+                "ALTER TABLE projects ADD COLUMN IF NOT EXISTS user_id VARCHAR(128)"
+            )
+        )
+        await conn.execute(
+            text(
+                "CREATE INDEX IF NOT EXISTS ix_projects_user_id ON projects(user_id)"
+            )
+        )
         await conn.execute(
             text(
                 "ALTER TABLE sources ADD COLUMN IF NOT EXISTS project_id UUID REFERENCES projects(id) ON DELETE CASCADE"

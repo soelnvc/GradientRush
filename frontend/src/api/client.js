@@ -1,7 +1,18 @@
 const API_BASE = "";
 
+function getHeaders(custom = {}) {
+  const headers = { ...custom };
+  const token = localStorage.getItem("gradientrush_id_token");
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+  return headers;
+}
+
 export async function listProjects() {
-  const res = await fetch(`${API_BASE}/api/projects`);
+  const res = await fetch(`${API_BASE}/api/projects`, {
+    headers: getHeaders(),
+  });
   if (!res.ok) throw new Error("Failed to fetch projects");
   return res.json();
 }
@@ -9,7 +20,7 @@ export async function listProjects() {
 export async function createProject(data) {
   const res = await fetch(`${API_BASE}/api/projects`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: getHeaders({ "Content-Type": "application/json" }),
     body: JSON.stringify(data),
   });
   if (!res.ok) {
@@ -22,6 +33,7 @@ export async function createProject(data) {
 export async function deleteProject(id) {
   const res = await fetch(`${API_BASE}/api/projects/${id}`, {
     method: "DELETE",
+    headers: getHeaders(),
   });
   if (!res.ok) throw new Error("Failed to delete project");
   return true;
@@ -35,6 +47,7 @@ export async function uploadFile(file, projectId = null) {
   }
   const res = await fetch(`${API_BASE}/api/sources/upload`, {
     method: "POST",
+    headers: getHeaders(),
     body: formData,
   });
   if (!res.ok) {
@@ -48,13 +61,17 @@ export async function listSources(projectId = null) {
   const url = projectId
     ? `${API_BASE}/api/sources?project_id=${projectId}`
     : `${API_BASE}/api/sources`;
-  const res = await fetch(url);
+  const res = await fetch(url, {
+    headers: getHeaders(),
+  });
   if (!res.ok) throw new Error("Failed to fetch sources");
   return res.json();
 }
 
 export async function getSource(id) {
-  const res = await fetch(`${API_BASE}/api/sources/${id}`);
+  const res = await fetch(`${API_BASE}/api/sources/${id}`, {
+    headers: getHeaders(),
+  });
   if (!res.ok) throw new Error("Failed to fetch source");
   return res.json();
 }
@@ -62,6 +79,7 @@ export async function getSource(id) {
 export async function processSource(id) {
   const res = await fetch(`${API_BASE}/api/sources/${id}/process`, {
     method: "POST",
+    headers: getHeaders(),
   });
   if (!res.ok) {
     const err = await res.json();
@@ -80,7 +98,7 @@ export async function queryKnowledge(question, textOnlyBaseline = false, project
   }
   const res = await fetch(`${API_BASE}/api/query`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: getHeaders({ "Content-Type": "application/json" }),
     body: JSON.stringify(payload),
   });
   if (!res.ok) throw new Error("Query failed");
@@ -88,7 +106,9 @@ export async function queryKnowledge(question, textOnlyBaseline = false, project
 }
 
 export async function getSourceEvidence(id) {
-  const res = await fetch(`${API_BASE}/api/sources/${id}/evidence`);
+  const res = await fetch(`${API_BASE}/api/sources/${id}/evidence`, {
+    headers: getHeaders(),
+  });
   if (!res.ok) throw new Error("Failed to fetch evidence");
   return res.json();
 }

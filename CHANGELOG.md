@@ -1,5 +1,11 @@
 # Version History
 
+## Version 1.4.0 (Major: Firebase Google Auth & Multi-Tenant User Isolation)
+- **Firebase Google Authentication**: 1-click Google Sign-In with popup OAuth flow.
+- **Cryptographic Backend Verification**: FastAPI verifies Firebase ID tokens using `google-auth` on every API request.
+- **Multi-Tenant User Isolation**: Added `user_id` database index to `projects` so user workspaces and documents are completely private.
+- **Apple User Profile UI**: Minimalist user avatar, account details, and one-click Sign Out popover in top navbar.
+
 ## Version 1.3.6 (UI: Minimalist Hero Drop Box & Doubled 80px Nav Gap)
 - **Minimalist Hero Drop Box**: Right-aligned dashed drop area for immediate drag & drop or click file ingestion.
 - **Breathable 80px Nav Gap**: Doubled spacing between navigation items for an open, separated Apple look.

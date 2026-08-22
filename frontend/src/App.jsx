@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { BrowserRouter, Routes, Route, NavLink, useLocation } from "react-router-dom";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 import { ProjectProvider, useProject } from "./context/ProjectContext";
 import Dashboard from "./pages/Dashboard";
 import Sources from "./pages/Sources";
@@ -9,8 +10,10 @@ import Compare from "./pages/Compare";
 
 function Nav() {
   const location = useLocation();
+  const { user, loginWithGoogle, logout } = useAuth();
   const { projects, currentProject, switchProject, createProject } = useProject();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [newProjectName, setNewProjectName] = useState("");
   const [newProjectDesc, setNewProjectDesc] = useState("");
@@ -21,6 +24,9 @@ function Nav() {
     const handleClickOutside = (e) => {
       if (!e.target.closest("#workspace-switcher-container")) {
         setDropdownOpen(false);
+      }
+      if (!e.target.closest("#user-menu-container")) {
+        setUserMenuOpen(false);
       }
     };
     window.addEventListener("click", handleClickOutside);
@@ -317,6 +323,142 @@ function Nav() {
               </div>
             )}
           </div>
+
+          {/* Right 2: Minimalist Apple Google Sign-In / User Avatar */}
+          <div id="user-menu-container" style={{ position: "relative" }}>
+            {user ? (
+              <div
+                onClick={() => setUserMenuOpen(!userMenuOpen)}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  cursor: "pointer",
+                  padding: "4px 6px",
+                  borderRadius: "980px",
+                  background: userMenuOpen ? "rgba(255, 255, 255, 0.08)" : "transparent",
+                  transition: "background 0.15s ease",
+                }}
+              >
+                {user.photoURL ? (
+                  <img
+                    src={user.photoURL}
+                    alt={user.displayName || "User"}
+                    style={{
+                      width: "22px",
+                      height: "22px",
+                      borderRadius: "50%",
+                      objectFit: "cover",
+                    }}
+                  />
+                ) : (
+                  <div
+                    style={{
+                      width: "22px",
+                      height: "22px",
+                      borderRadius: "50%",
+                      background: "rgba(255, 255, 255, 0.15)",
+                      color: "#ffffff",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: "11px",
+                      fontWeight: "600",
+                    }}
+                  >
+                    {(user.displayName || user.email || "U")[0].toUpperCase()}
+                  </div>
+                )}
+                <span style={{ fontSize: "12px", color: "#86868b", maxWidth: "90px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {user.displayName?.split(" ")[0] || user.email?.split("@")[0]}
+                </span>
+              </div>
+            ) : (
+              <button
+                onClick={loginWithGoogle}
+                style={{
+                  background: "rgba(255, 255, 255, 0.05)",
+                  border: "1px solid rgba(255, 255, 255, 0.12)",
+                  color: "#f5f5f7",
+                  padding: "4px 12px",
+                  borderRadius: "980px",
+                  fontSize: "11px",
+                  fontWeight: "500",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  transition: "all 0.15s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)";
+                  e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.3)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "rgba(255, 255, 255, 0.05)";
+                  e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.12)";
+                }}
+              >
+                <span>Google Sign In</span>
+              </button>
+            )}
+
+            {/* User Popover Menu */}
+            {userMenuOpen && user && (
+              <div
+                style={{
+                  position: "absolute",
+                  top: "calc(100% + 12px)",
+                  right: 0,
+                  width: "220px",
+                  background: "rgba(10, 10, 12, 0.95)",
+                  backdropFilter: "blur(20px)",
+                  WebkitBackdropFilter: "blur(20px)",
+                  border: "1px solid rgba(255, 255, 255, 0.1)",
+                  borderRadius: "10px",
+                  padding: "8px",
+                  zIndex: 100,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "4px",
+                }}
+              >
+                <div style={{ padding: "6px 8px" }}>
+                  <div style={{ fontSize: "12px", fontWeight: "600", color: "#f5f5f7" }}>
+                    {user.displayName || "Google Account"}
+                  </div>
+                  <div style={{ fontSize: "11px", color: "#6e6e73", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {user.email}
+                  </div>
+                </div>
+
+                <div style={{ height: "1px", background: "rgba(255, 255, 255, 0.06)", margin: "2px 0" }} />
+
+                <div
+                  onClick={() => {
+                    setUserMenuOpen(false);
+                    logout();
+                  }}
+                  style={{
+                    padding: "8px",
+                    borderRadius: "6px",
+                    cursor: "pointer",
+                    fontSize: "12px",
+                    color: "#ef4444",
+                    transition: "background 0.1s ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = "rgba(239, 68, 68, 0.1)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = "transparent";
+                  }}
+                >
+                  Sign Out
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </header>
 
@@ -445,29 +587,31 @@ function Nav() {
 
 export default function App() {
   return (
-    <ProjectProvider>
-      <BrowserRouter>
-        <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "#000000" }}>
-          <Nav />
-          <main
-            style={{
-              flex: 1,
-              width: "100%",
-              maxWidth: "1200px",
-              margin: "0 auto",
-              padding: "48px 32px 80px 32px",
-            }}
-          >
-            <Routes>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/sources" element={<Sources />} />
-              <Route path="/sources/:id" element={<SourceDetail />} />
-              <Route path="/query" element={<Query />} />
-              <Route path="/compare" element={<Compare />} />
-            </Routes>
-          </main>
-        </div>
-      </BrowserRouter>
-    </ProjectProvider>
+    <AuthProvider>
+      <ProjectProvider>
+        <BrowserRouter>
+          <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "#000000" }}>
+            <Nav />
+            <main
+              style={{
+                flex: 1,
+                width: "100%",
+                maxWidth: "1200px",
+                margin: "0 auto",
+                padding: "48px 32px 80px 32px",
+              }}
+            >
+              <Routes>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/sources" element={<Sources />} />
+                <Route path="/sources/:id" element={<SourceDetail />} />
+                <Route path="/query" element={<Query />} />
+                <Route path="/compare" element={<Compare />} />
+              </Routes>
+            </main>
+          </div>
+        </BrowserRouter>
+      </ProjectProvider>
+    </AuthProvider>
   );
 }
