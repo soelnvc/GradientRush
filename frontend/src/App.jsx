@@ -10,10 +10,22 @@ import Compare from "./pages/Compare";
 function Nav() {
   const location = useLocation();
   const { projects, currentProject, switchProject, createProject } = useProject();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [newProjectName, setNewProjectName] = useState("");
   const [newProjectDesc, setNewProjectDesc] = useState("");
   const [creating, setCreating] = useState(false);
+
+  // Close dropdown on outside click
+  React.useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (!e.target.closest("#workspace-switcher-container")) {
+        setDropdownOpen(false);
+      }
+    };
+    window.addEventListener("click", handleClickOutside);
+    return () => window.removeEventListener("click", handleClickOutside);
+  }, []);
 
   // Don't show nav in SourceDetail to maximize immersion
   if (location.pathname.startsWith("/sources/") && location.pathname !== "/sources") return null;
@@ -37,6 +49,7 @@ function Nav() {
       setNewProjectName("");
       setNewProjectDesc("");
       setShowModal(false);
+      setDropdownOpen(false);
     } catch (err) {
       alert(err.message);
     } finally {
@@ -68,33 +81,54 @@ function Nav() {
             margin: "0 auto",
           }}
         >
-          {/* Left: Project Selector */}
-          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            <span style={{ fontSize: "11px", fontWeight: "600", color: "#6e6e73", letterSpacing: "0.05em", textTransform: "uppercase" }}>
-              Workspace
-            </span>
-            <select
-              value={currentProject?.id || ""}
-              onChange={(e) => switchProject(e.target.value)}
+          {/* Left: GR Logo with 360-degree rotation on hover */}
+          <NavLink
+            to="/"
+            style={{
+              textDecoration: "none",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+            }}
+          >
+            <div
               style={{
-                background: "rgba(255, 255, 255, 0.06)",
-                color: "#f5f5f7",
-                border: "1px solid rgba(255, 255, 255, 0.1)",
-                borderRadius: "6px",
-                padding: "4px 8px",
-                fontSize: "12px",
-                fontWeight: "500",
-                outline: "none",
+                width: "28px",
+                height: "28px",
+                borderRadius: "8px",
+                background: "linear-gradient(135deg, #ffffff 0%, #a1a1aa 100%)",
+                color: "#000000",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontWeight: "900",
+                fontSize: "13px",
+                letterSpacing: "-0.04em",
+                boxShadow: "0 2px 8px rgba(255, 255, 255, 0.15)",
+                transition: "transform 0.65s cubic-bezier(0.34, 1.56, 0.64, 1)",
                 cursor: "pointer",
+                userSelect: "none",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "rotate(360deg)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "rotate(0deg)";
               }}
             >
-              {projects.map((p) => (
-                <option key={p.id} value={p.id} style={{ background: "#111", color: "#fff" }}>
-                  {p.name}
-                </option>
-              ))}
-            </select>
-          </div>
+              GR
+            </div>
+            <span
+              style={{
+                fontSize: "13px",
+                fontWeight: "600",
+                letterSpacing: "-0.02em",
+                color: "#f5f5f7",
+              }}
+            >
+              GradientRush
+            </span>
+          </NavLink>
 
           {/* Center: Main Navigation */}
           <nav
@@ -111,32 +145,176 @@ function Nav() {
             <NavLink to="/compare" style={linkStyle}>Benchmark</NavLink>
           </nav>
 
-          {/* Right: + New Workspace Button */}
-          <div>
+          {/* Right: Only 1 Single Premium Apple-Style Workspace Switcher Button */}
+          <div id="workspace-switcher-container" style={{ position: "relative" }}>
             <button
-              onClick={() => setShowModal(true)}
+              onClick={() => setDropdownOpen(!dropdownOpen)}
               style={{
-                background: "transparent",
-                border: "1px solid rgba(255, 255, 255, 0.15)",
+                background: "rgba(255, 255, 255, 0.05)",
+                border: "1px solid rgba(255, 255, 255, 0.12)",
                 color: "#f5f5f7",
-                padding: "4px 12px",
+                padding: "6px 14px",
                 borderRadius: "980px",
-                fontSize: "11px",
+                fontSize: "12px",
                 fontWeight: "500",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
                 cursor: "pointer",
                 transition: "all 0.15s ease",
+                outline: "none",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)";
-                e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.3)";
+                e.currentTarget.style.background = "rgba(255, 255, 255, 0.09)";
+                e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.22)";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = "transparent";
-                e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.15)";
+                e.currentTarget.style.background = "rgba(255, 255, 255, 0.05)";
+                e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.12)";
               }}
             >
-              + New Workspace
+              <span
+                style={{
+                  width: "6px",
+                  height: "6px",
+                  borderRadius: "50%",
+                  background: "#22c55e",
+                  boxShadow: "0 0 8px rgba(34, 197, 94, 0.6)",
+                }}
+              />
+              <span style={{ maxWidth: "150px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {currentProject?.name || "Select Workspace"}
+              </span>
+              <span style={{ fontSize: "9px", opacity: 0.6, transform: dropdownOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s ease" }}>
+                ▼
+              </span>
             </button>
+
+            {/* Expanded Apple-Style Popover Menu */}
+            {dropdownOpen && (
+              <div
+                style={{
+                  position: "absolute",
+                  top: "calc(100% + 8px)",
+                  right: 0,
+                  width: "280px",
+                  background: "rgba(18, 18, 20, 0.95)",
+                  backdropFilter: "saturate(180%) blur(24px)",
+                  WebkitBackdropFilter: "saturate(180%) blur(24px)",
+                  border: "1px solid rgba(255, 255, 255, 0.12)",
+                  borderRadius: "14px",
+                  padding: "6px",
+                  boxShadow: "0 20px 40px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.05)",
+                  zIndex: 100,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "2px",
+                }}
+              >
+                {/* 1. TOP OPTION: + New Project */}
+                <div
+                  onClick={() => {
+                    setDropdownOpen(false);
+                    setShowModal(true);
+                  }}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "10px",
+                    padding: "10px 12px",
+                    borderRadius: "8px",
+                    cursor: "pointer",
+                    background: "rgba(255, 255, 255, 0.05)",
+                    transition: "background 0.15s ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = "rgba(255, 255, 255, 0.12)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = "rgba(255, 255, 255, 0.05)";
+                  }}
+                >
+                  <div
+                    style={{
+                      width: "22px",
+                      height: "22px",
+                      borderRadius: "6px",
+                      background: "#ffffff",
+                      color: "#000000",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: "14px",
+                      fontWeight: "600",
+                    }}
+                  >
+                    +
+                  </div>
+                  <div>
+                    <div style={{ fontSize: "13px", fontWeight: "600", color: "#f5f5f7" }}>
+                      New Workspace
+                    </div>
+                    <div style={{ fontSize: "11px", color: "#86868b" }}>
+                      Create isolated project space
+                    </div>
+                  </div>
+                </div>
+
+                {/* Divider */}
+                <div style={{ height: "1px", background: "rgba(255, 255, 255, 0.08)", margin: "4px 6px" }} />
+
+                {/* Section Header */}
+                <div style={{ padding: "4px 10px", fontSize: "10px", fontWeight: "600", color: "#6e6e73", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                  Workspaces ({projects.length})
+                </div>
+
+                {/* List of Workspaces */}
+                <div style={{ maxHeight: "220px", overflowY: "auto", display: "flex", flexDirection: "column", gap: "2px" }}>
+                  {projects.map((p) => {
+                    const isSelected = p.id === currentProject?.id;
+                    return (
+                      <div
+                        key={p.id}
+                        onClick={() => {
+                          switchProject(p.id);
+                          setDropdownOpen(false);
+                        }}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          padding: "8px 12px",
+                          borderRadius: "8px",
+                          cursor: "pointer",
+                          background: isSelected ? "rgba(255, 255, 255, 0.08)" : "transparent",
+                          transition: "background 0.15s ease",
+                        }}
+                        onMouseEnter={(e) => {
+                          if (!isSelected) e.currentTarget.style.background = "rgba(255, 255, 255, 0.04)";
+                        }}
+                        onMouseLeave={(e) => {
+                          if (!isSelected) e.currentTarget.style.background = "transparent";
+                        }}
+                      >
+                        <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+                          <span style={{ fontSize: "13px", fontWeight: isSelected ? "600" : "400", color: isSelected ? "#ffffff" : "#d1d1d6" }}>
+                            {p.name}
+                          </span>
+                          <span style={{ fontSize: "11px", color: "#6e6e73" }}>
+                            {p.sources_count || 0} sources
+                          </span>
+                        </div>
+                        {isSelected && (
+                          <span style={{ color: "#ffffff", fontSize: "13px", fontWeight: "600" }}>
+                            ✓
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </header>

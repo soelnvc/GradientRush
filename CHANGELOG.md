@@ -1,5 +1,11 @@
 # Version History
 
+## Version 1.3.1 (UI: GR 360° Rotating Logo & Apple Workspace Popover)
+- **GR 360° Rotating Logo**: Bold `GR` emblem on the top-left with smooth 360-degree rotation on hover.
+- **Unified Workspace Button**: Single Apple-style pill button on the top-right opening an elevated frosted-glass menu.
+- **Top Option '+ New Workspace'**: Prominent new project action placed at the top of the menu with quick modal creation.
+- **Active Workspace Indicator**: Subtle checkmarks and source counters for each project.
+
 ## Version 1.3.0 (Major: Project-Based Context Isolation & Workspace Bifurcation)
 - **Project Workspaces**: Added `projects` entity and relational foreign key scoping across `sources`, `evidence`, and `evidence_relationships`.
 - **Scoped Ingestion & Retrieval**: Automatic isolation of file uploads, vector similarity searches, and graph relationship expansions per project.
