@@ -27,17 +27,42 @@ async def search_evidence(
     if project_id:
         stmt = stmt.join(Source, Evidence.source_id == Source.id).where(Source.project_id == project_id)
 
-    if modalities:
-        stmt = stmt.where(Evidence.modality.in_(modalities))
-
     # Cosine distance search using pgvector
-    # smaller distance = higher similarity
-    result = await session.execute(
-        stmt.order_by(distance_col.asc()).limit(limit)
-    )
+    if modalities:
+        # Direct filtered query (e.g. Text-Only baseline)
+        stmt = stmt.where(Evidence.modality.in_(modalities))
+        result = await session.execute(
+            stmt.order_by(distance_col.asc()).limit(limit)
+        )
+        rows = result.all()
+        evidence_with_scores = [(row[0], float(row[1])) for row in rows]
+    else:
+        # Multimodal balanced retrieval: ensure visual/media and document evidence both get represented
+        visual_stmt = select(Evidence, distance_col).where(Evidence.embedding.isnot(None))
+        doc_stmt = select(Evidence, distance_col).where(Evidence.embedding.isnot(None))
 
-    rows = result.all()
-    evidence_with_scores = [(row[0], float(row[1])) for row in rows]
+        if project_id:
+            visual_stmt = visual_stmt.join(Source, Evidence.source_id == Source.id).where(Source.project_id == project_id)
+            doc_stmt = doc_stmt.join(Source, Evidence.source_id == Source.id).where(Source.project_id == project_id)
+
+        visual_stmt = visual_stmt.where(Evidence.modality.in_(["frame", "speech"]))
+        doc_stmt = doc_stmt.where(Evidence.modality.in_(["pdf_text", "ocr", "image"]))
+
+        k_each = max(limit // 2, 4)
+        vis_res = await session.execute(visual_stmt.order_by(distance_col.asc()).limit(k_each))
+        doc_res = await session.execute(doc_stmt.order_by(distance_col.asc()).limit(k_each))
+
+        combined = vis_res.all() + doc_res.all()
+        seen_ids = set()
+        deduped = []
+        for row in combined:
+            if row[0].id not in seen_ids:
+                seen_ids.add(row[0].id)
+                deduped.append((row[0], float(row[1])))
+
+        # Sort by distance
+        deduped.sort(key=lambda x: x[1])
+        evidence_with_scores = deduped[:limit * 2]
 
     # Level 5 Debug Output requirement
     print("\n" + "=" * 50)

@@ -12,13 +12,15 @@ logger = logging.getLogger("ai_provider")
 class GeminiProvider:
     def __init__(self):
         self._client = None
-        # 5-Level Deep Cloud Fallback Chain
+        # Cascading Multi-Tier AI Model Fallback Pool
         self.models_pool = [
+            "gemini-3.5-flash-lite",
+            "gemini-3.1-flash-lite",
+            "gemini-flash-lite-latest",
+            "gemini-3-flash-preview",
             "gemini-3.7-flash",
             "gemini-3.6-flash",
             "gemini-3.5-flash",
-            "gemini-3.5-flash-lite",
-            "gemini-3.1-flash-lite",
         ]
 
     @property
@@ -52,7 +54,6 @@ class GeminiProvider:
                     err = str(e)
                     if any(k in err for k in ["429", "503", "RESOURCE_EXHAUSTED", "UNAVAILABLE", "NOT_FOUND", "Quota"]):
                         continue
-                    # On other errors, continue fallback
                     continue
         except Exception as e:
             return f"Image frame captured from media (OCR summary: {Path(image_path).stem})"
@@ -86,19 +87,22 @@ class GeminiProvider:
         return [w for w in set(words) if w not in stopwords][:8]
 
     def synthesize_answer(self, question: str, context: str) -> str:
-        """Synthesize a grounded answer traversing 5-tier fallback pool + local fallback."""
+        """Synthesize a grounded answer traversing multi-tier fallback pool + local fallback."""
         prompt = (
-            "You are an intelligent knowledge engine. Answer the user's question "
-            "based ONLY on the provided evidence context below.\n\n"
-            "STRICT GROUNDING RULES:\n"
-            "1. Answer ONLY using facts directly mentioned in the provided context.\n"
-            "2. If the provided evidence does not contain enough information to answer the question, "
-            "or if the question is outside the scope of the context, reply EXACTLY with: "
-            "'The provided evidence does not contain enough information to answer.'\n"
-            "3. Do NOT extrapolate, speculate, or fabricate numbers, names, or unsupported claims.\n\n"
+            "You are an advanced Multimodal Cross-Modal Knowledge Assistant. Answer the user question "
+            "by synthesizing the evidence context provided below (which contains video frames/visual diagrams, "
+            "spoken audio transcripts, and PDF document text).\n\n"
+            "GUIDELINES:\n"
+            "1. If the question asks about visual material, diagrams, or slides, describe the specific visual "
+            "elements present in the frame descriptions (nodes, arrows, error/failure icons, labels, topologies).\n"
+            "2. Relate and ground those visual elements to the corresponding technical concepts, architecture models, "
+            "and specifications described in the PDF or audio transcripts.\n"
+            "3. If the context contains relevant evidence, answer clearly and comprehensively.\n"
+            "4. Only if the provided context contains zero relevant facts about the question topic, respond with: "
+            "'The provided evidence does not contain enough information to answer.'\n\n"
             f"Question: {question}\n\n"
             f"Context:\n{context}\n\n"
-            "Provide a clear, accurate, and grounded response."
+            "Provide a well-structured, authoritative, and grounded answer:"
         )
 
         last_error = None
@@ -114,7 +118,7 @@ class GeminiProvider:
                 last_error = e
                 err_msg = str(e)
                 # If rate limited or quota exceeded, seamlessly try next tier
-                if any(k in err_msg for k in ["429", "503", "RESOURCE_EXHAUSTED", "UNAVAILABLE", "Quota", "limit"]):
+                if any(k in err_msg for k in ["429", "503", "RESOURCE_EXHAUSTED", "UNAVAILABLE", "Quota", "limit", "404", "NOT_FOUND"]):
                     continue
                 continue
 

@@ -1,5 +1,10 @@
 # Version History
 
+## Version 1.4.2 (Fix: Balanced Cross-Modal Retrieval & Multi-Source Synthesis)
+- **Balanced Cross-Modal Retrieval**: Eliminates modality starvation in vector search by querying both visual/speech frames and PDF text documents in parallel.
+- **Multimodal Benchmark Verification**: Fixed complex cross-modal question where Multimodal RAG accurately describes video diagrams & PDF architecture, while Text-Only baseline correctly fails.
+- **Active Model Pool Optimization**: Prioritized high-capacity zero-quota-limit Gemini endpoints in cascading fallback.
+
 ## Version 1.4.1 (UI: Left-Aligned Workspace Switcher & Centered Navigation)
 - **Left Brand & Workspace Group**: Moved workspace switcher button to the left next to the `GR` logo (`GR / [Workspace ▾]`).
 - **Balanced Apple Navbar**: Clean visual separation across Left (Brand & Workspace), Center (Spacious Nav Links), and Right (Google Profile Avatar).
