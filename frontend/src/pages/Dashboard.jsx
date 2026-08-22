@@ -59,97 +59,192 @@ export default function Dashboard() {
   };
 
   return (
-    <div>
-      <h1>📡 Knowledge Engine</h1>
-      <p style={{ color: "#888", marginTop: -8 }}>
-        Multimodal Evidence Retrieval System
-      </p>
-
-      {/* Upload */}
-      <div
-        style={{
-          border: "2px dashed #444",
-          borderRadius: 8,
-          padding: 24,
-          textAlign: "center",
-          marginBottom: 24,
-        }}
-      >
-        <label
+    <div style={{ display: "flex", flexDirection: "column", gap: "56px" }}>
+      {/* Hero Section */}
+      <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+        <h1
           style={{
-            cursor: "pointer",
-            padding: "10px 24px",
-            background: "#2563eb",
-            color: "#fff",
-            borderRadius: 6,
-            fontWeight: 600,
+            fontSize: "44px",
+            fontWeight: "600",
+            letterSpacing: "-0.035em",
+            color: "#f5f5f7",
+            lineHeight: 1.1,
           }}
         >
-          {uploading ? "Uploading..." : "+ Upload Sources"}
-          <input
-            type="file"
-            multiple
-            onChange={handleUpload}
-            style={{ display: "none" }}
-            disabled={uploading}
-            accept=".mp4,.avi,.mkv,.mov,.webm,.mp3,.wav,.m4a,.flac,.pdf,.png,.jpg,.jpeg,.webp,.gif,.bmp"
-          />
-        </label>
-        <p style={{ color: "#666", fontSize: 14, marginTop: 12 }}>
-          Video, Audio, PDF, or Image
+          Knowledge Engine.
+        </h1>
+        <p
+          style={{
+            fontSize: "20px",
+            fontWeight: "400",
+            color: "#86868b",
+            letterSpacing: "-0.015em",
+            maxWidth: "640px",
+            lineHeight: 1.4,
+          }}
+        >
+          Multimodal evidence retrieval with provenance-preserving graph expansion across video, audio, PDFs, and vision.
         </p>
+
+        {/* Upload Action */}
+        <div style={{ marginTop: "16px" }}>
+          <label
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              cursor: uploading ? "not-allowed" : "pointer",
+              padding: "10px 22px",
+              background: "#ffffff",
+              color: "#000000",
+              borderRadius: "980px",
+              fontSize: "14px",
+              fontWeight: "500",
+              letterSpacing: "-0.01em",
+              boxShadow: "0 4px 14px rgba(255, 255, 255, 0.12)",
+              transition: "transform 0.15s ease, opacity 0.15s ease",
+              opacity: uploading ? 0.6 : 1,
+            }}
+          >
+            {uploading ? "Ingesting..." : "Upload Sources"}
+            <input
+              type="file"
+              multiple
+              onChange={handleUpload}
+              style={{ display: "none" }}
+              disabled={uploading}
+              accept=".mp4,.avi,.mkv,.mov,.webm,.mp3,.wav,.m4a,.flac,.pdf,.png,.jpg,.jpeg,.webp,.gif,.bmp"
+            />
+          </label>
+          <span style={{ marginLeft: "16px", fontSize: "13px", color: "#6e6e73" }}>
+            MP4, WAV, PDF, PNG supported
+          </span>
+        </div>
       </div>
 
       {error && (
-        <div style={{ color: "#ef4444", marginBottom: 16 }}>
-          ⚠ {error}
+        <div
+          style={{
+            padding: "14px 18px",
+            background: "rgba(239, 68, 68, 0.08)",
+            border: "1px solid rgba(239, 68, 68, 0.2)",
+            borderRadius: "12px",
+            color: "#f87171",
+            fontSize: "14px",
+          }}
+        >
+          {error}
         </div>
       )}
 
-      {/* Sources list */}
-      <h2>Sources ({sources.length})</h2>
-      {sources.length === 0 ? (
-        <p style={{ color: "#666" }}>No sources uploaded yet.</p>
-      ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          {sources.map((s) => (
-            <Link
-              key={s.id}
-              to={`/sources/${s.id}`}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 12,
-                padding: "12px 16px",
-                background: "#1a1a2e",
-                borderRadius: 8,
-                textDecoration: "none",
-                color: "inherit",
-              }}
-            >
-              <span style={{ fontSize: 24 }}>
-                {TYPE_ICONS[s.source_type] || "📎"}
-              </span>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 500 }}>{s.filename}</div>
-                <div style={{ fontSize: 12, color: "#888" }}>
-                  {s.source_type}
-                </div>
-              </div>
-              <span
+      {/* Sources Grid / List */}
+      <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+          <h2 style={{ fontSize: "20px", fontWeight: "600", color: "#f5f5f7", letterSpacing: "-0.02em" }}>
+            Ingested Sources
+          </h2>
+          <span style={{ fontSize: "13px", color: "#86868b" }}>
+            {sources.length} document{sources.length === 1 ? "" : "s"}
+          </span>
+        </div>
+
+        {sources.length === 0 ? (
+          <div
+            style={{
+              padding: "48px 0",
+              color: "#6e6e73",
+              fontSize: "15px",
+              borderTop: "1px solid rgba(255, 255, 255, 0.08)",
+            }}
+          >
+            No documents uploaded yet. Upload a PDF, video, or audio file to begin.
+          </div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+            {sources.map((s) => (
+              <Link
+                key={s.id}
+                to={`/sources/${s.id}`}
                 style={{
-                  fontSize: 12,
-                  fontWeight: 600,
-                  color: STATUS_COLORS[s.status],
-                  textTransform: "uppercase",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  padding: "16px 20px",
+                  background: "rgba(255, 255, 255, 0.03)",
+                  border: "1px solid rgba(255, 255, 255, 0.06)",
+                  borderRadius: "14px",
+                  transition: "background 0.2s ease, border-color 0.2s ease, transform 0.15s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "rgba(255, 255, 255, 0.06)";
+                  e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.14)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "rgba(255, 255, 255, 0.03)";
+                  e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.06)";
                 }}
               >
-                {s.status}
-              </span>
-            </Link>
-          ))}
-        </div>
-      )}
+                <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+                  <div
+                    style={{
+                      width: "36px",
+                      height: "36px",
+                      borderRadius: "8px",
+                      background: "rgba(255, 255, 255, 0.06)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: "14px",
+                      fontWeight: "600",
+                      color: "#86868b",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    {s.source_type.slice(0, 3)}
+                  </div>
+                  <div>
+                    <div style={{ fontSize: "15px", fontWeight: "500", color: "#f5f5f7" }}>
+                      {s.filename}
+                    </div>
+                    <div style={{ fontSize: "12px", color: "#86868b", marginTop: "2px" }}>
+                      {s.source_type} • {new Date(s.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+                  <span
+                    style={{
+                      fontSize: "11px",
+                      fontWeight: "500",
+                      padding: "4px 10px",
+                      borderRadius: "980px",
+                      letterSpacing: "0.02em",
+                      textTransform: "uppercase",
+                      background:
+                        s.status === "completed"
+                          ? "rgba(255, 255, 255, 0.1)"
+                          : s.status === "failed"
+                          ? "rgba(239, 68, 68, 0.15)"
+                          : "rgba(255, 255, 255, 0.05)",
+                      color:
+                        s.status === "completed"
+                          ? "#f5f5f7"
+                          : s.status === "failed"
+                          ? "#f87171"
+                          : "#86868b",
+                      border: "1px solid rgba(255, 255, 255, 0.06)",
+                    }}
+                  >
+                    {s.status}
+                  </span>
+                  <span style={{ color: "#6e6e73", fontSize: "16px" }}>→</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
