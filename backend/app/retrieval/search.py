@@ -48,7 +48,7 @@ async def search_evidence(
         visual_stmt = visual_stmt.where(Evidence.modality.in_(["frame", "speech"]))
         doc_stmt = doc_stmt.where(Evidence.modality.in_(["pdf_text", "ocr", "image"]))
 
-        k_each = max(limit // 2, 4)
+        k_each = max(1, (limit + 1) // 2)
         vis_res = await session.execute(visual_stmt.order_by(distance_col.asc()).limit(k_each))
         doc_res = await session.execute(doc_stmt.order_by(distance_col.asc()).limit(k_each))
 
@@ -62,7 +62,7 @@ async def search_evidence(
 
         # Sort by distance
         deduped.sort(key=lambda x: x[1])
-        evidence_with_scores = deduped[:limit * 2]
+        evidence_with_scores = deduped[:limit]
 
     # Level 5 Debug Output requirement
     print("\n" + "=" * 50)

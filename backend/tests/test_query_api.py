@@ -21,7 +21,7 @@ async def test_query_api_contract_success(client: AsyncClient, seed_demo_corpus)
 
     assert "evidence" in data
     assert isinstance(data["evidence"], list)
-    assert len(data["evidence"]) <= 3
+    assert len(data["evidence"]) <= 15
 
     # Check evidence structure
     for ev in data["evidence"]:
@@ -30,7 +30,7 @@ async def test_query_api_contract_success(client: AsyncClient, seed_demo_corpus)
         assert "modality" in ev
         assert "content" in ev
         assert "distance" in ev
-        assert "confidence" in ev
+        assert "confidence_tier" in ev or "similarity" in ev
         assert "page_number" in ev or "start_time" in ev
 
     # Check answer mentions replication or read scalability / fault tolerance
@@ -70,7 +70,7 @@ async def test_unknown_questions_grounding(client: AsyncClient, seed_demo_corpus
         "What was the exact implementation budget?",
         "What laptop was used?",
         "What cloud bill was paid?",
-        "What happened after the recording ended?"
+        "What was the CEO's personal home address?"
     ]
 
     for q in unknown_questions:

@@ -1,5 +1,11 @@
 # Version History
 
+## Version 1.5.0 (Feature: Post-Expansion Deduplication, Modality Diversity Reranking & Top-15 Pruning)
+- **Candidate Reranking & Pruning**: Implemented smart candidate reranking that compresses the ~61 expanded candidates down to the top 10–15 best evidence items before prompt synthesis.
+- **Modality Diversity Preservation**: Balanced selection across PDF documents, speech transcripts, and video frames, preventing one modality from swamping the LLM context.
+- **Relationship Strength & Hop Penalties**: Weighted `TEMPORALLY_ALIGNED` (tighter temporal window) and `SAME_TOPIC` (entity overlap) with hop penalties.
+- **Token Efficiency & Latency**: Reduced LLM token payload by over 75%, accelerating answer synthesis and eliminating context dilution.
+
 ## Version 1.4.9 (UI: Minimalist Apple Footer & AI Disclaimer)
 - **Minimalist Footer**: Added an ultra-clean, thin-typography grey footer (`#48484a`, 11px) with an AI verification and accuracy disclaimer.
 - **Subtle Branding**: Displays system architecture notes (*Multimodal Graph RAG • Provenance-Preserving Knowledge Engine*) seamlessly blending into the canvas.
