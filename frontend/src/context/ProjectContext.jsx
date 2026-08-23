@@ -35,6 +35,8 @@ export function ProjectProvider({ children }) {
 
   useEffect(() => {
     fetchProjects();
+    const interval = setInterval(fetchProjects, 3000);
+    return () => clearInterval(interval);
   }, []);
 
   const switchProject = (projectId) => {

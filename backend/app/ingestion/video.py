@@ -2,6 +2,7 @@
 
 import os
 import uuid
+import asyncio
 import ffmpeg
 from pathlib import Path
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -21,8 +22,8 @@ async def process_video(session: AsyncSession, source_id: uuid.UUID, file_path: 
     
     audio_path = source_dir / "audio.wav"
     
-    # 1. Extract audio
-    try:
+    # 1. Extract audio in thread
+    def _extract_audio():
         (
             ffmpeg
             .input(file_path)
@@ -30,12 +31,14 @@ async def process_video(session: AsyncSession, source_id: uuid.UUID, file_path: 
             .overwrite_output()
             .run(quiet=True)
         )
+
+    try:
+        await asyncio.to_thread(_extract_audio)
     except ffmpeg.Error as e:
         raise RuntimeError(f"Failed to extract audio: {e.stderr.decode() if e.stderr else str(e)}")
 
-    # 2. Extract frames (1 frame every 10 seconds)
-    # Uses ffmpeg's select filter to pick one frame every 10 seconds.
-    try:
+    # 2. Extract frames (1 frame every 10 seconds) in thread
+    def _extract_frames():
         (
             ffmpeg
             .input(file_path)
@@ -44,18 +47,17 @@ async def process_video(session: AsyncSession, source_id: uuid.UUID, file_path: 
             .overwrite_output()
             .run(quiet=True)
         )
+
+    try:
+        await asyncio.to_thread(_extract_frames)
     except ffmpeg.Error as e:
         raise RuntimeError(f"Failed to extract frames: {e.stderr.decode() if e.stderr else str(e)}")
 
     # 3. Process extracted frames
     frame_files = sorted(list(frames_dir.glob("frame_*.jpg")))
     for i, frame_file in enumerate(frame_files):
-        # Calculate timestamp: 1 frame every 10 seconds
         timestamp = float(i * 10)
-        
-        # Optionally, get vision description for the frame right away, 
-        # or just store the frame and do it lazily. For now, we process it.
-        description = ai_provider.analyze_image(str(frame_file))
+        description = await asyncio.to_thread(ai_provider.analyze_image, str(frame_file))
         
         await create_evidence(
             session=session,
