@@ -1,5 +1,9 @@
 # Version History
 
+## Version 1.4.9 (UI: Minimalist Apple Footer & AI Disclaimer)
+- **Minimalist Footer**: Added an ultra-clean, thin-typography grey footer (`#48484a`, 11px) with an AI verification and accuracy disclaimer.
+- **Subtle Branding**: Displays system architecture notes (*Multimodal Graph RAG • Provenance-Preserving Knowledge Engine*) seamlessly blending into the canvas.
+
 ## Version 1.4.8 (Fix: Calibrated Confidence Thresholds for Dense Vector Space)
 - **Vector Space Calibration**: Calibrated the 7-tier confidence thresholds to the natural distribution of 384-dimensional dense embeddings (`all-MiniLM-L6-v2`), ensuring evidence accurately distributes across `Full`, `Very High`, `High`, `Moderate`, and `Low`.
 - **Eliminated Artificial Clustering**: Direct relevant matches now correctly show `Very High` / `High` instead of being artificially penalized as `Moderate`.
