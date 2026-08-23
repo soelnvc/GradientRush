@@ -13,18 +13,18 @@ router = APIRouter(prefix="/api/query", tags=["query"])
 
 
 def calculate_confidence_category(distance: float) -> str:
-    """Classify retrieval vector distance into standardized 7-tier confidence bands."""
-    if distance < 0.15:
+    """Classify retrieval vector distance into calibrated 7-tier confidence bands for dense embeddings."""
+    if distance < 0.20:
         return "Full"
-    elif distance < 0.25:
+    elif distance < 0.32:
         return "Very High"
-    elif distance < 0.35:
+    elif distance < 0.44:
         return "High"
-    elif distance < 0.50:
+    elif distance < 0.58:
         return "Moderate"
-    elif distance < 0.65:
+    elif distance < 0.70:
         return "Low"
-    elif distance < 0.80:
+    elif distance < 0.85:
         return "Very Low"
     else:
         return "Zero"

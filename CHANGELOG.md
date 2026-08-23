@@ -1,5 +1,13 @@
 # Version History
 
+## Version 1.4.8 (Fix: Calibrated Confidence Thresholds for Dense Vector Space)
+- **Vector Space Calibration**: Calibrated the 7-tier confidence thresholds to the natural distribution of 384-dimensional dense embeddings (`all-MiniLM-L6-v2`), ensuring evidence accurately distributes across `Full`, `Very High`, `High`, `Moderate`, and `Low`.
+- **Eliminated Artificial Clustering**: Direct relevant matches now correctly show `Very High` / `High` instead of being artificially penalized as `Moderate`.
+
+## Version 1.4.7 (UI: Monochromatic Desaturated Apple Confidence Badges)
+- **Desaturated Confidence Tags**: Replaced saturated color badges with subtle, high-contrast monochrome confidence tags (`Full` through `Zero`) that maintain the Apple-minimalist aesthetic.
+- **Badge Readability**: Optimized font weights and background opacity for improved scanning of metadata in high-density evidence lists.
+
 ## Version 1.4.6 (Feature: 7-Tier Standardized Confidence Bands & Problem Statement Audit)
 - **7-Tier Confidence Classification**: Implemented standardized confidence categories (`Full`, `Very High`, `High`, `Moderate`, `Low`, `Very Low`, `Zero`) mapped directly from cosine vector distance.
 - **Color-Coded Badges**: Added sleek color-coded confidence tags on all evidence cards in Search and Benchmark.
