@@ -17,52 +17,64 @@ async def search_evidence(
     if not query or not query.strip():
         return []
 
-    # Generate embedding for the query
-    query_embedding = generate_embedding(query.strip())
+    # Multi-aspect sub-queries for entity-dense technical queries
+    import re
+    clean_q = re.sub(r"[^\w\s-]", "", query)
+    tokens = [w for w in clean_q.split() if len(w) > 3]
+    subqueries = [query.strip()]
 
-    distance_col = Evidence.embedding.cosine_distance(query_embedding).label("distance")
+    if len(tokens) > 5:
+        stopwords = {
+            "what", "when", "where", "which", "that", "this", "about", "from",
+            "with", "does", "show", "said", "being", "approx", "approximately",
+            "same", "time", "point", "video", "reference", "described", "relate",
+            "evidence", "visual", "material", "moments", "accompanying"
+        }
+        topic_words = [w for w in tokens if w.lower() not in stopwords]
+        if topic_words:
+            subqueries.append(" ".join(topic_words[:4]))
+            if len(topic_words) > 2:
+                subqueries.append(f"{topic_words[0]} {topic_words[1]}")
 
-    stmt = select(Evidence, distance_col).where(Evidence.embedding.isnot(None))
+    all_found = []
+    seen = set()
 
-    if project_id:
-        stmt = stmt.join(Source, Evidence.source_id == Source.id).where(Source.project_id == project_id)
+    for sub_q in subqueries:
+        sub_emb = generate_embedding(sub_q)
+        s_dist_col = Evidence.embedding.cosine_distance(sub_emb).label("distance")
 
-    # Cosine distance search using pgvector
-    if modalities:
-        # Direct filtered query (e.g. Text-Only baseline)
-        stmt = stmt.where(Evidence.modality.in_(modalities))
-        result = await session.execute(
-            stmt.order_by(distance_col.asc()).limit(limit)
-        )
-        rows = result.all()
-        evidence_with_scores = [(row[0], float(row[1])) for row in rows]
-    else:
-        # Multimodal balanced retrieval: ensure visual/media and document evidence both get represented
-        visual_stmt = select(Evidence, distance_col).where(Evidence.embedding.isnot(None))
-        doc_stmt = select(Evidence, distance_col).where(Evidence.embedding.isnot(None))
+        if modalities:
+            stmt = select(Evidence, s_dist_col).where(Evidence.embedding.isnot(None), Evidence.modality.in_(modalities))
+            if project_id:
+                stmt = stmt.join(Source, Evidence.source_id == Source.id).where(Source.project_id == project_id)
+            res = await session.execute(stmt.order_by(s_dist_col.asc()).limit(max(limit, 8)))
+            for row in res.all():
+                if row[0].id not in seen:
+                    seen.add(row[0].id)
+                    all_found.append((row[0], float(row[1])))
+        else:
+            # Parallel multi-modality retrieval across frames, speech, and documents
+            f_stmt = select(Evidence, s_dist_col).where(Evidence.embedding.isnot(None), Evidence.modality == "frame")
+            s_stmt = select(Evidence, s_dist_col).where(Evidence.embedding.isnot(None), Evidence.modality == "speech")
+            d_stmt = select(Evidence, s_dist_col).where(Evidence.embedding.isnot(None), Evidence.modality.in_(["pdf_text", "ocr", "image"]))
 
-        if project_id:
-            visual_stmt = visual_stmt.join(Source, Evidence.source_id == Source.id).where(Source.project_id == project_id)
-            doc_stmt = doc_stmt.join(Source, Evidence.source_id == Source.id).where(Source.project_id == project_id)
+            if project_id:
+                f_stmt = f_stmt.join(Source, Evidence.source_id == Source.id).where(Source.project_id == project_id)
+                s_stmt = s_stmt.join(Source, Evidence.source_id == Source.id).where(Source.project_id == project_id)
+                d_stmt = d_stmt.join(Source, Evidence.source_id == Source.id).where(Source.project_id == project_id)
 
-        visual_stmt = visual_stmt.where(Evidence.modality.in_(["frame", "speech"]))
-        doc_stmt = doc_stmt.where(Evidence.modality.in_(["pdf_text", "ocr", "image"]))
+            k_sub = max(2, (limit + 1) // 2)
+            f_res = await session.execute(f_stmt.order_by(s_dist_col.asc()).limit(k_sub))
+            s_res = await session.execute(s_stmt.order_by(s_dist_col.asc()).limit(k_sub))
+            d_res = await session.execute(d_stmt.order_by(s_dist_col.asc()).limit(k_sub))
 
-        k_each = max(1, (limit + 1) // 2)
-        vis_res = await session.execute(visual_stmt.order_by(distance_col.asc()).limit(k_each))
-        doc_res = await session.execute(doc_stmt.order_by(distance_col.asc()).limit(k_each))
+            for row in f_res.all() + s_res.all() + d_res.all():
+                if row[0].id not in seen:
+                    seen.add(row[0].id)
+                    all_found.append((row[0], float(row[1])))
 
-        combined = vis_res.all() + doc_res.all()
-        seen_ids = set()
-        deduped = []
-        for row in combined:
-            if row[0].id not in seen_ids:
-                seen_ids.add(row[0].id)
-                deduped.append((row[0], float(row[1])))
-
-        # Sort by distance
-        deduped.sort(key=lambda x: x[1])
-        evidence_with_scores = deduped[:limit]
+    all_found.sort(key=lambda x: x[1])
+    evidence_with_scores = all_found[:max(limit * 2, 8)]
 
     # Level 5 Debug Output requirement
     print("\n" + "=" * 50)

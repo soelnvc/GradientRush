@@ -1,5 +1,10 @@
 # Version History
 
+## Version 1.5.3 (Fix: Multi-Aspect Sub-Query Retrieval & Model Pool Verification)
+- **Multi-Aspect Sub-Query Retrieval**: Added automatic entity and technical sub-phrase extraction during search to ensure complex, multi-clause benchmark questions retrieve both global architecture and specific subsystem candidates.
+- **Model Pool Verification**: Verified active Google GenAI model IDs (`gemini-3.6-flash`, `gemini-3.5-flash-lite`, `gemini-3.1-flash-lite`) with zero 404/quota failover latency.
+- **Enhanced Cross-Modal Grounding**: Refined synthesis prompt to produce structured Markdown answers synthesizing visual slide components, audio context, and PDF specifications.
+
 ## Version 1.5.2 (UI: Native Markdown Rendering for Answers)
 - **Markdown Typography Engine**: Integrated `react-markdown` with customized dark Apple typography components across `/query` and `/compare`.
 - **Rich Output Rendering**: Automatically renders headers (`###`), bulleted lists, bold highlights (`**term**`), and monospace code tags instead of raw markdown syntax.

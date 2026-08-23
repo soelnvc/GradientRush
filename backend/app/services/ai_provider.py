@@ -14,13 +14,11 @@ class GeminiProvider:
         self._client = None
         # Cascading Multi-Tier AI Model Fallback Pool
         self.models_pool = [
+            "gemini-3.6-flash",
             "gemini-3.5-flash-lite",
             "gemini-3.1-flash-lite",
             "gemini-flash-lite-latest",
-            "gemini-3-flash-preview",
             "gemini-3.7-flash",
-            "gemini-3.6-flash",
-            "gemini-3.5-flash",
         ]
 
     @property
@@ -89,19 +87,17 @@ class GeminiProvider:
     def synthesize_answer(self, question: str, context: str) -> str:
         """Synthesize a grounded answer traversing multi-tier fallback pool + local fallback."""
         prompt = (
-            "You are an advanced Multimodal Cross-Modal Knowledge Assistant. Answer the user question "
-            "by synthesizing the evidence context provided below (which contains video frames/visual diagrams, "
-            "spoken audio transcripts, and PDF document text).\n\n"
-            "GUIDELINES:\n"
-            "1. If the question asks about visual material, diagrams, or slides, describe the specific visual "
-            "elements present in the frame descriptions (nodes, arrows, error/failure icons, labels, topologies).\n"
-            "2. Relate and ground those visual elements to the corresponding technical concepts, architecture models, "
-            "and specifications described in the PDF or audio transcripts.\n"
-            "3. If the context contains relevant evidence, answer clearly and comprehensively.\n"
-            "4. Only if the provided context contains zero relevant facts about the question topic, respond with: "
-            "'The provided evidence does not contain enough information to answer.'\n\n"
+            "You are an advanced Multimodal Cross-Modal Knowledge Assistant. Synthesize an authoritative answer "
+            "to the user question using the grounding evidence provided below (comprising video frame descriptions, "
+            "spoken audio transcripts, and technical PDF documentation).\n\n"
+            "INSTRUCTIONS:\n"
+            "1. Synthesize insights across all provided modalities (visual diagrams/slides, speech transcripts, and PDF text).\n"
+            "2. When discussing visual diagrams, describe the specific visual components (nodes, arrows, error/failure indicators, data center layouts).\n"
+            "3. Connect visual and spoken evidence directly to the architectural concepts and specifications described in the PDF documentation.\n"
+            "4. Be structured, clear, and comprehensive using Markdown headings and bullet points.\n"
+            "5. If the context contains NO relevant facts at all regarding the question topic, state: 'The provided evidence does not contain enough information to answer.'\n\n"
             f"Question: {question}\n\n"
-            f"Context:\n{context}\n\n"
+            f"Grounding Evidence:\n{context}\n\n"
             "Provide a well-structured, authoritative, and grounded answer:"
         )
 
