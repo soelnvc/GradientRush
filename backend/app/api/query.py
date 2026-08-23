@@ -49,10 +49,11 @@ async def query_knowledge(
     # 1. Retrieve initial evidence scoped to project
     try:
         modalities = ["pdf_text", "ocr"] if request.text_only_baseline else None
+        search_limit = max(request.limit, 8) if not request.text_only_baseline else request.limit
         initial_results = await search_evidence(
             session,
             q,
-            request.limit,
+            search_limit,
             modalities=modalities,
             project_id=request.project_id,
         )

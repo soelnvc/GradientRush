@@ -74,7 +74,7 @@ async def search_evidence(
                     all_found.append((row[0], float(row[1])))
 
     all_found.sort(key=lambda x: x[1])
-    evidence_with_scores = all_found[:max(limit * 2, 8)]
+    evidence_with_scores = all_found[:limit]
 
     # Level 5 Debug Output requirement
     print("\n" + "=" * 50)
