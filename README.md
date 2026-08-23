@@ -295,7 +295,7 @@ backend/tests/test_vector_search.py::test_vector_search_empty_query PASSED [100%
 
 <div align="center">
 
-**Built with ❤️ for the Hackathon by Team GradientRush**
+**Built with ❤️ for the Hackathon by Team The House of Scaler**
 
 ⭐ **Star us on [GitHub](https://github.com/soelnvc/GradientRush)** ⭐
 
