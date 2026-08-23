@@ -1,5 +1,9 @@
 # Version History
 
+## Version 1.5.2 (UI: Native Markdown Rendering for Answers)
+- **Markdown Typography Engine**: Integrated `react-markdown` with customized dark Apple typography components across `/query` and `/compare`.
+- **Rich Output Rendering**: Automatically renders headers (`###`), bulleted lists, bold highlights (`**term**`), and monospace code tags instead of raw markdown syntax.
+
 ## Version 1.5.1 (Docs: Comprehensive Technical & Aesthetic README)
 - **High-Impact README**: Created a detailed, colorful, and beautifully structured `README.md` with custom ASCII banner, colorful shields.io badges, system architecture workflow diagrams, 5-stage retrieval pipeline deep dive, 7-tier vector grounding math, and quickstart guides.
 - **Verification Suite Documentation**: Documented the 18/18 passing Pytest automated test suite and benchmark evaluation.

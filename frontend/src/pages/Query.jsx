@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
+import ReactMarkdown from "react-markdown";
 import { queryKnowledge } from "../api/client";
 import { useProject } from "../context/ProjectContext";
 
@@ -181,13 +182,38 @@ export default function Query() {
                 border: "1px solid rgba(255, 255, 255, 0.1)",
                 padding: "24px 28px",
                 borderRadius: "16px",
-                fontSize: "16px",
+                fontSize: "15px",
                 lineHeight: "1.7",
                 color: "#f5f5f7",
-                whiteSpace: "pre-wrap",
               }}
             >
-              {result.answer}
+              <ReactMarkdown
+                components={{
+                  h1: ({ node, ...props }) => <h1 style={{ fontSize: "18px", fontWeight: "600", color: "#f5f5f7", margin: "16px 0 8px 0" }} {...props} />,
+                  h2: ({ node, ...props }) => <h2 style={{ fontSize: "16px", fontWeight: "600", color: "#f5f5f7", margin: "14px 0 6px 0" }} {...props} />,
+                  h3: ({ node, ...props }) => <h3 style={{ fontSize: "14.5px", fontWeight: "600", color: "#f5f5f7", margin: "12px 0 6px 0" }} {...props} />,
+                  p: ({ node, ...props }) => <p style={{ margin: "0 0 10px 0", color: "#e5e5ea", lineHeight: "1.65" }} {...props} />,
+                  ul: ({ node, ...props }) => <ul style={{ margin: "4px 0 12px 0", paddingLeft: "20px", display: "flex", flexDirection: "column", gap: "6px" }} {...props} />,
+                  ol: ({ node, ...props }) => <ol style={{ margin: "4px 0 12px 0", paddingLeft: "20px", display: "flex", flexDirection: "column", gap: "6px" }} {...props} />,
+                  li: ({ node, ...props }) => <li style={{ color: "#d1d1d6", lineHeight: "1.6" }} {...props} />,
+                  strong: ({ node, ...props }) => <strong style={{ color: "#ffffff", fontWeight: "600" }} {...props} />,
+                  code: ({ node, inline, ...props }) => (
+                    <code
+                      style={{
+                        background: "rgba(255, 255, 255, 0.08)",
+                        padding: "2px 6px",
+                        borderRadius: "4px",
+                        fontFamily: "monospace",
+                        fontSize: "13px",
+                        color: "#f5f5f7",
+                      }}
+                      {...props}
+                    />
+                  ),
+                }}
+              >
+                {result.answer}
+              </ReactMarkdown>
             </div>
           </div>
 
