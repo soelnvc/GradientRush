@@ -1,5 +1,11 @@
 # Version History
 
+## Version 1.4.6 (Feature: 7-Tier Standardized Confidence Bands & Problem Statement Audit)
+- **7-Tier Confidence Classification**: Implemented standardized confidence categories (`Full`, `Very High`, `High`, `Moderate`, `Low`, `Very Low`, `Zero`) mapped directly from cosine vector distance.
+- **Color-Coded Badges**: Added sleek color-coded confidence tags on all evidence cards in Search and Benchmark.
+- **High-Res Frame Image Previews**: Mounted `/api/media` static route so expanding video frame evidence displays full graphical screenshots.
+- **Full Problem Statement Compliance**: Verified all Core Scope (Multimodal Ingestion, Structured Graph Representation, Cross-Modal Temporal/Semantic Relationships, Multi-Source Retrieval) and Stretch Goals against `ProblemStatement.pdf`.
+
 ## Version 1.4.5 (Fix: Mathematically Rigorous Vector Metrics)
 - **Vector Metrics Rigor**: Replaced misleading 100% confidence scores with exact mathematical vector metrics: `Cosine Distance: {distance}` and `Similarity: {1.0 - distance}` (e.g. Distance 0.3721 -> Similarity 0.6279).
 - **Backend & UI Metric Alignment**: Updated FastAPI query API and frontend evidence cards to display verified vector metrics.

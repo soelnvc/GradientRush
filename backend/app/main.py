@@ -48,7 +48,9 @@ app.include_router(query_router)
 
 # Static files for media viewing
 DATA_DIR = Path(os.getenv("DATA_DIR", "./data"))
+DATA_DIR.mkdir(parents=True, exist_ok=True)
 app.mount("/data", StaticFiles(directory=DATA_DIR), name="data")
+app.mount("/api/media", StaticFiles(directory=DATA_DIR), name="media")
 
 
 @app.get("/health")

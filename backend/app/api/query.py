@@ -12,6 +12,24 @@ from backend.app.services.ai_provider import ai_provider
 router = APIRouter(prefix="/api/query", tags=["query"])
 
 
+def calculate_confidence_category(distance: float) -> str:
+    """Classify retrieval vector distance into standardized 7-tier confidence bands."""
+    if distance < 0.15:
+        return "Full"
+    elif distance < 0.25:
+        return "Very High"
+    elif distance < 0.35:
+        return "High"
+    elif distance < 0.50:
+        return "Moderate"
+    elif distance < 0.65:
+        return "Low"
+    elif distance < 0.80:
+        return "Very Low"
+    else:
+        return "Zero"
+
+
 class QueryRequest(BaseModel):
     question: str = Field(..., description="Query question")
     limit: int = Field(5, ge=1, le=50, description="Top-K evidence items to retrieve")
@@ -69,7 +87,7 @@ async def query_knowledge(
     # 4. Synthesize answer
     answer = ai_provider.synthesize_answer(q, context_str)
 
-    # 5. Level 8: Format response with provenance, cosine distance, and vector similarity
+    # 5. Level 8: Format response with provenance, cosine distance, vector similarity, and confidence category
     return {
         "answer": answer,
         "evidence": [
@@ -84,6 +102,7 @@ async def query_knowledge(
                 "frame_path": e.frame_path,
                 "distance": round(dist, 4),
                 "similarity": round(max(0.0, min(1.0, 1.0 - dist)), 4),
+                "confidence_tier": calculate_confidence_category(dist),
                 "chain": chain,
             }
             for e, dist, chain in expanded_results
