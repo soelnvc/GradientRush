@@ -54,11 +54,12 @@ def _detect_source_type(filename: str) -> SourceType:
 
 @router.post("/upload")
 async def upload_source(
+    background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
     project_id: Optional[uuid.UUID] = Form(None),
     session: AsyncSession = Depends(get_session),
 ):
-    """Upload a file and create a source record assigned to a project workspace."""
+    """Upload a file, create a source record, and immediately launch background ingestion pipeline."""
     source_type = _detect_source_type(file.filename)
 
     target_project_id = project_id or DEFAULT_PROJECT_ID
@@ -89,6 +90,9 @@ async def upload_source(
     session.add(source)
     await session.commit()
     await session.refresh(source)
+
+    # Auto-dispatch ingestion pipeline in background
+    background_tasks.add_task(_bg_run_pipeline, source_id)
 
     return {
         "id": str(source.id),
