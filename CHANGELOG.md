@@ -1,5 +1,9 @@
 # Version History
 
+## Version 1.5.1 (Docs: Comprehensive Technical & Aesthetic README)
+- **High-Impact README**: Created a detailed, colorful, and beautifully structured `README.md` with custom ASCII banner, colorful shields.io badges, system architecture workflow diagrams, 5-stage retrieval pipeline deep dive, 7-tier vector grounding math, and quickstart guides.
+- **Verification Suite Documentation**: Documented the 18/18 passing Pytest automated test suite and benchmark evaluation.
+
 ## Version 1.5.0 (Feature: Post-Expansion Deduplication, Modality Diversity Reranking & Top-15 Pruning)
 - **Candidate Reranking & Pruning**: Implemented smart candidate reranking that compresses the ~61 expanded candidates down to the top 10–15 best evidence items before prompt synthesis.
 - **Modality Diversity Preservation**: Balanced selection across PDF documents, speech transcripts, and video frames, preventing one modality from swamping the LLM context.
