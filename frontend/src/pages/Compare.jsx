@@ -61,31 +61,22 @@ export default function Compare() {
   };
 
   const getConfidenceBadge = (tier) => {
-    const styles = {
-      "Full": { bg: "rgba(16, 185, 129, 0.15)", color: "#10b981", border: "rgba(16, 185, 129, 0.3)" },
-      "Very High": { bg: "rgba(16, 185, 129, 0.12)", color: "#34d399", border: "rgba(16, 185, 129, 0.25)" },
-      "High": { bg: "rgba(6, 182, 212, 0.12)", color: "#22d3ee", border: "rgba(6, 182, 212, 0.25)" },
-      "Moderate": { bg: "rgba(245, 158, 11, 0.12)", color: "#fbbf24", border: "rgba(245, 158, 11, 0.25)" },
-      "Low": { bg: "rgba(249, 115, 22, 0.12)", color: "#fb923c", border: "rgba(249, 115, 22, 0.25)" },
-      "Very Low": { bg: "rgba(239, 68, 68, 0.12)", color: "#f87171", border: "rgba(239, 68, 68, 0.25)" },
-      "Zero": { bg: "rgba(113, 113, 122, 0.12)", color: "#a1a1aa", border: "rgba(113, 113, 122, 0.25)" },
-    };
-    const s = styles[tier] || styles["Moderate"];
+    if (!tier) return null;
     return (
       <span
         style={{
           fontSize: "10px",
-          fontWeight: "600",
+          fontWeight: "500",
           letterSpacing: "0.02em",
-          padding: "2px 7px",
+          padding: "2px 6px",
           borderRadius: "4px",
-          background: s.bg,
-          color: s.color,
-          border: `1px solid ${s.border}`,
+          background: "rgba(255, 255, 255, 0.04)",
+          color: "#86868b",
+          border: "1px solid rgba(255, 255, 255, 0.06)",
           textTransform: "uppercase",
         }}
       >
-        {tier || "Moderate"}
+        {tier}
       </span>
     );
   };
